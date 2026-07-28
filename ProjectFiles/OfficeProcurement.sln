@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement", "OfficeProcurement\OfficeProcurement.csproj", "{D7C83012-F753-4949-866B-94C075286FC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Entities", "OfficeProcurement.Entities\OfficeProcurement.Entities.csproj", "{886DAEA9-DDAC-482B-B6FD-A008CF9060D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccessLayer", "DataAccessLayer", "{CF70D0C9-1343-49B6-ADCB-BD24979EA117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseAuditEntity", "DataAccessLayer\BaseAuditEntity\BaseAuditEntity.csproj", "{1A2338F5-8F88-467C-934F-CB22B77ADA38}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7C83012-F753-4949-866B-94C075286FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C83012-F753-4949-866B-94C075286FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C83012-F753-4949-866B-94C075286FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C83012-F753-4949-866B-94C075286FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{886DAEA9-DDAC-482B-B6FD-A008CF9060D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{886DAEA9-DDAC-482B-B6FD-A008CF9060D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{886DAEA9-DDAC-482B-B6FD-A008CF9060D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{886DAEA9-DDAC-482B-B6FD-A008CF9060D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A2338F5-8F88-467C-934F-CB22B77ADA38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A2338F5-8F88-467C-934F-CB22B77ADA38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A2338F5-8F88-467C-934F-CB22B77ADA38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A2338F5-8F88-467C-934F-CB22B77ADA38}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1A2338F5-8F88-467C-934F-CB22B77ADA38} = {CF70D0C9-1343-49B6-ADCB-BD24979EA117}
+	EndGlobalSection
+EndGlobal
