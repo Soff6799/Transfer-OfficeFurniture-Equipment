@@ -12,6 +12,7 @@
 <img width="1080" height="818" alt="Screenshot_20260728_161720" src="https://github.com/user-attachments/assets/def65619-e5ca-43e7-be45-fc5e51d70b05" />
 
 Схема связи сущностей:
+```mermaid
 erDiagram
     Supplier ||--o{ Contract : "заключает как Продавец"
     Client ||--o{ Contract : "заключает как Покупатель"
@@ -69,5 +70,6 @@ erDiagram
         decimal Price
         string Condition
     }
+```
 
 ```
