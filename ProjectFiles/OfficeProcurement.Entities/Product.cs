@@ -1,13 +1,24 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
+﻿namespace OfficeProcurement.Entities;
 
-namespace OfficeProcurement.Entities;
-
+/// <summary>
+/// Сущность товара
+/// </summary>
 public class Product
 {
     /// <summary>
     /// Название
     /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Складской номер
+    /// </summary>
+    public string? StockNumber  { get; set; }
+
+    /// <summary>
+    /// Описание состояния/характеристик
+    /// </summary>
+    public string? Condition { get; set; }
 
     /// <summary>
     /// Единица измерения

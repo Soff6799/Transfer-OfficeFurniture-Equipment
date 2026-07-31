@@ -1,9 +1,9 @@
 namespace OfficeProcurement.Entities;
 
 /// <summary>
-/// Сущность поставщик
+/// Сущность клиента
 /// </summary>
-public class Supplier
+public class Client
 {
     /// <summary>
     /// Название компании
@@ -11,7 +11,7 @@ public class Supplier
     public string CompanyName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Фамилия контактного лица в Рп
+    /// Фамилия контактного лица
     /// </summary>
     public string ContactLastName { get; set; } = string.Empty;
 
