@@ -16,9 +16,9 @@ public class Product
     public string? StockNumber  { get; set; }
 
     /// <summary>
-    /// Описание состояния/характеристик
+    /// Заводские характеристики (Цвет: серый, 100x50x70)
     /// </summary>
-    public string? Condition { get; set; }
+    public string? Specifications { get; set; }
 
     /// <summary>
     /// Единица измерения
@@ -26,27 +26,8 @@ public class Product
     public string Unit { get; set; } = string.Empty;
 
     /// <summary>
-    /// Количество
+    /// Цена
     /// </summary>
-    public int Quantity { get; set; }
-
-    /// <summary>
-    /// Цена за единицу
-    /// </summary>
-    public decimal UnitPrice { get; set; }
-
-    /// <summary>
-    /// Общая стоимость
-    /// </summary>
-    public decimal GetTotalAmount()=> Quantity * UnitPrice;
-
-    /// <summary>
-    /// НДС
-    /// </summary>
-    public decimal GetVatAmount(decimal vatRate = 0.20m) => GetTotalAmount() * vatRate;
-
-
-
-
+    public decimal Price { get; set; }
 
 }
