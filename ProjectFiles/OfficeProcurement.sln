@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Entities"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccessLayer", "DataAccessLayer", "{CF70D0C9-1343-49B6-ADCB-BD24979EA117}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseAuditEntity", "DataAccessLayer\BaseAuditEntity\BaseAuditEntity.csproj", "{1A2338F5-8F88-467C-934F-CB22B77ADA38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Dal.Contracts", "DataAccessLayer\OfficeProcurement.Dal.Contracts\OfficeProcurement.Dal.Contracts.csproj", "{1A2338F5-8F88-467C-934F-CB22B77ADA38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
