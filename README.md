@@ -18,6 +18,7 @@ erDiagram
     Client ||--o{ Contract : "заключает как Покупатель"
     Contract ||--o{ TransferAct : "является основанием для"
     TransferAct ||--o{ TransferActItem : "содержит строки таблицы"
+    Product ||--o{ TransferActItem : "выступает в качестве"
 
     Supplier {
         int Id PK
