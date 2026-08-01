@@ -1,9 +1,11 @@
+using OfficeProcurement.Dal.Contracts;
+
 namespace OfficeProcurement.Entities;
 
 /// <summary>
 /// Сущность Договора
 /// </summary>
-public class Contract
+public class Contract: BaseAuditEntity
 {
     /// <summary>
     /// Номер договора

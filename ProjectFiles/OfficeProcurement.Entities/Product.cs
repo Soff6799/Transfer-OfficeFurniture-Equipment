@@ -1,9 +1,11 @@
-﻿namespace OfficeProcurement.Entities;
+﻿using OfficeProcurement.Dal.Contracts;
+
+namespace OfficeProcurement.Entities;
 
 /// <summary>
 /// Сущность товара
 /// </summary>
-public class Product
+public class Product: BaseAuditEntity
 {
     /// <summary>
     /// Название

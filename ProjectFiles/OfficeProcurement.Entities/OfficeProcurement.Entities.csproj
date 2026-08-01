@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DataAccessLayer\OfficeProcurement.Dal.Contracts\OfficeProcurement.Dal.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>

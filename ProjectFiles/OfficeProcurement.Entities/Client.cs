@@ -1,9 +1,11 @@
+using OfficeProcurement.Dal.Contracts;
+
 namespace OfficeProcurement.Entities;
 
 /// <summary>
 /// Сущность клиента
 /// </summary>
-public class Client
+public class Client: BaseAuditEntity
 {
     /// <summary>
     /// Название компании

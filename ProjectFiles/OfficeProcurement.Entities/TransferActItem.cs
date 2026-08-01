@@ -1,9 +1,11 @@
+using OfficeProcurement.Dal.Contracts;
+
 namespace OfficeProcurement.Entities;
 
 /// <summary>
 /// Сущность содержимого акта
 /// </summary>
-public class TransferActItem
+public class TransferActItem: BaseAuditEntity
 {
     /// <summary>
     /// Название
