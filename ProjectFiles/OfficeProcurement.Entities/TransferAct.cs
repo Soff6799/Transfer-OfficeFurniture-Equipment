@@ -1,5 +1,8 @@
 namespace OfficeProcurement.Entities;
 
+/// <summary>
+/// Сущность самого акта
+/// </summary>
 public class TransferAct
 {
     /// <summary>
