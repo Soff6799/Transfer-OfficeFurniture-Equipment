@@ -22,24 +22,28 @@ erDiagram
     Supplier {
         int Id PK
         string CompanyName
+        string ContactLastName
+        string ContactName
+        string ContactPatronymic
+        string CeoBasis
         string Inn
         string LegalAddress
-        string CeoFullName
-        string CeoBasis
-        string Phone
         string Email
+        string Phone
         bool IsActive
     }
 
     Client {
         int Id PK
         string CompanyName
+        string ContactLastName
+        string ContactName
+        string ContactPatronymic
+        string CeoBasis
         string Inn
         string LegalAddress
-        string CeoFullName
-        string CeoBasis
-        string Phone
         string Email
+        string Phone
         bool IsActive
     }
 
@@ -63,12 +67,22 @@ erDiagram
     TransferActItem {
         int Id PK
         int TransferActId FK
-        string EquipmentName
-        string SerialNumber
+        string Name
+        string StockNumber
+        string Specifications
         string Unit
         decimal Quantity
-        decimal Price
+        decimal UnitPrice
+    }
+
+    Product {
+        int Id PK
+        string Name
+        string StockNumber
+        string Specifications
         string Condition
+        string Unit
+        decimal Price
     }
 ```
 
