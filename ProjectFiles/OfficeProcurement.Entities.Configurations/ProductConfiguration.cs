@@ -38,6 +38,13 @@ public class ProductConfiguration: IEntityTypeConfiguration<Product>
         builder.Property(x => x.Price)
             .IsRequired()
             .HasColumnType("decimal(18,2)");
+
+        builder.HasIndex(x => x.StockNumber)
+            .HasDatabaseName("IX_Clients_Inn")
+            .IsUnique();
+
+        builder.HasIndex(x => x.Name)
+            .HasDatabaseName("IX_Clients_ContactLastName");
     }
 
 }
