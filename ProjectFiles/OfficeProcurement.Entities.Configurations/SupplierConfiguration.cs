@@ -10,11 +10,12 @@ namespace OfficeProcurement.Entities.Configurations;
 public class SupplierConfiguration: IEntityTypeConfiguration<Supplier>
 {
     /// <summary>
-    /// Настраивает правила отображения полей сущности, индексы и ограничения для таблицы породавцов
+    /// Настраивает правила отображения полей сущности, индексы
+    /// и ограничения для таблицы породавцов
     /// </summary>
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {
-        builder.ToTable("Supplier");
+        builder.ToTable("Suppliers");
         builder.HasIdAsKey();
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
@@ -59,11 +60,11 @@ public class SupplierConfiguration: IEntityTypeConfiguration<Supplier>
             .IsRequired();
 
         builder.HasIndex(x => x.Inn)
-            .HasDatabaseName("IX_Supplier_Inn")
+            .HasDatabaseName("IX_Suppliers_Inn")
             .IsUnique();
 
         builder.HasIndex(x => x.ContactLastName)
-            .HasDatabaseName("IX_Supplier_ContactLastName");
+            .HasDatabaseName("IX_Suppliers_ContactLastName");
 
 
     }

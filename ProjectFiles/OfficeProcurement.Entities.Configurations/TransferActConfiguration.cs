@@ -32,7 +32,7 @@ public class TransferActConfiguration: IEntityTypeConfiguration<TransferAct>
             .HasMaxLength(50);
 
         builder.HasIndex(x => x.Number)
-            .HasDatabaseName("IX_Clients_Inn")
+            .HasDatabaseName("IX_TransferActs_Number")
             .IsUnique();
     }
 

@@ -10,7 +10,8 @@ namespace OfficeProcurement.Entities.Configurations;
 public class ClientConfiguration: IEntityTypeConfiguration<Client>
 {
     /// <summary>
-    /// Настраивает правила отображения полей сущности, индексы и ограничения для таблицы клиентов
+    /// Настраивает правила отображения полей сущности, индексы
+    /// и ограничения для таблицы клиентов
     /// </summary>
     public void Configure(EntityTypeBuilder<Client> builder)
     {
@@ -67,6 +68,5 @@ public class ClientConfiguration: IEntityTypeConfiguration<Client>
 
 
     }
-
 }
 
