@@ -5,16 +5,16 @@ using OfficeProcurement.Context.EntityFrameworkCore;
 namespace OfficeProcurement.Entities.Configurations;
 
 /// <summary>
-/// Конфигурация сущности <see cref="Client"/> для  Entity Framework Core
+/// Конфигурация сущности <see cref="Supplier"/> для  Entity Framework Core
 /// </summary>
-public class ClientConfiguration: IEntityTypeConfiguration<Client>
+public class SupplierConfiguration: IEntityTypeConfiguration<Supplier>
 {
     /// <summary>
-    /// Настраивает правила отображения полей сущности, индексы и ограничения для таблицы клиентов
+    /// Настраивает правила отображения полей сущности, индексы и ограничения для таблицы породавцов
     /// </summary>
-    public void Configure(EntityTypeBuilder<Client> builder)
+    public void Configure(EntityTypeBuilder<Supplier> builder)
     {
-        builder.ToTable("Clients");
+        builder.ToTable("Supplier");
         builder.HasIdAsKey();
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
@@ -59,14 +59,12 @@ public class ClientConfiguration: IEntityTypeConfiguration<Client>
             .IsRequired();
 
         builder.HasIndex(x => x.Inn)
-            .HasDatabaseName("IX_Clients_Inn")
+            .HasDatabaseName("IX_Supplier_Inn")
             .IsUnique();
 
         builder.HasIndex(x => x.ContactLastName)
-            .HasDatabaseName("IX_Clients_ContactLastName");
+            .HasDatabaseName("IX_Supplier_ContactLastName");
 
 
     }
-
 }
-
