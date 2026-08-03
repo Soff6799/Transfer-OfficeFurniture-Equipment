@@ -1,6 +1,6 @@
 ﻿namespace OfficeProcurement.Dal.Contracts;
 
-public abstract class BaseAuditEntity
+public abstract class BaseAuditEntity : IEntityWithId, IEntityAuditCreated, IEntityAuditUpdate, IEntityAuditDeletedAt
 {
     /// <summary>
     /// Идентификатор
