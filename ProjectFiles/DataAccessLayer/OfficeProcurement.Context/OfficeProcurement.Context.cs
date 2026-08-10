@@ -4,7 +4,9 @@ using OfficeProcurement.Dal.Contracts.Repositories;
 
 namespace OfficeProcurement.Context;
 
-public class OfficeProcurementContext: DbContext
+public class OfficeProcurementContext: DbContext,
+    IReader,
+    IWriter
 {
     /// <summary>
     /// Инициирует новый экземпляр <see cref="FinalExerciseContext"/>
@@ -22,4 +24,18 @@ public class OfficeProcurementContext: DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IEntitiesAnchor).Assembly);
     }
+
+    IQueryable<TEntity> IReader.Read<TEntity>()
+    => base.Set<TEntity>()
+        .AsNoTracking();
+
+    void IWriter.Add<TEntity>(TEntity entity)
+    => base.Entry(entity).State = EntityState.Added;
+
+    void IWriter.Update<TEntity>(TEntity entity)
+    => base.Entry(entity).State = EntityState.Modified;
+
+    void IWriter.Delete<TEntity>(TEntity entity)
+    => base.Set<TEntity>().Remove(entity);
+
 }
