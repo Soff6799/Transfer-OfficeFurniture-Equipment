@@ -4,9 +4,10 @@ using OfficeProcurement.Dal.Contracts.Repositories;
 
 namespace OfficeProcurement.Context;
 
-public class OfficeProcurementContext: DbContext,
+public class OfficeProcurementContext : DbContext,
     IReader,
-    IWriter
+    IWriter,
+    IUnitOfWork
 {
     /// <summary>
     /// Инициирует новый экземпляр <see cref="FinalExerciseContext"/>
@@ -26,16 +27,28 @@ public class OfficeProcurementContext: DbContext,
     }
 
     IQueryable<TEntity> IReader.Read<TEntity>()
-    => base.Set<TEntity>()
-        .AsNoTracking();
+        => base.Set<TEntity>()
+            .AsNoTracking();
 
     void IWriter.Add<TEntity>(TEntity entity)
-    => base.Entry(entity).State = EntityState.Added;
+        => base.Entry(entity).State = EntityState.Added;
 
     void IWriter.Update<TEntity>(TEntity entity)
-    => base.Entry(entity).State = EntityState.Modified;
+        => base.Entry(entity).State = EntityState.Modified;
 
     void IWriter.Delete<TEntity>(TEntity entity)
-    => base.Set<TEntity>().Remove(entity);
+        => base.Set<TEntity>().Remove(entity);
 
+    async Task<int> IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        var count = await base.SaveChangesAsync(cancellationToken);
+        foreach (var entry in base.ChangeTracker.Entries().ToArray())
+        {
+            entry.State = EntityState.Detached;
+        }
+
+        return count;
+
+    }
 }
+
