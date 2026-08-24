@@ -10,7 +10,7 @@ public class OfficeProcurementContext : DbContext,
     IUnitOfWork
 {
     /// <summary>
-    /// Инициирует новый экземпляр <see cref="FinalExerciseContext"/>
+    /// Инициирует новый экземпляр <see cref="OfficeProcurementContext"/>
     /// </summary>
     public OfficeProcurementContext(DbContextOptions<OfficeProcurementContext> options)
         : base(options)
