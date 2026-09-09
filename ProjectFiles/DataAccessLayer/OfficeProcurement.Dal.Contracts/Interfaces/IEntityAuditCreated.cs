@@ -1,4 +1,4 @@
-namespace OfficeProcurement.Dal.Contracts;
+namespace OfficeProcurement.Dal.Contracts.Interfaces;
 
 public interface IEntityAuditCreated
 {
