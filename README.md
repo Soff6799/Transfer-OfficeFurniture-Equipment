@@ -1,6 +1,6 @@
 ### INFORMATION: Манжосова София Александровна ИП-24-4
 #### ТГ: (@Sofishokc) - https://t.me/Sofishokc
-#### upd:04.08.2026
+#### upd:14.09.2026
 - - - - 
 # Название проекта: Transfer-OfficeFurniture-Equipment
 ### Тема: Акт приёма-передачи 
