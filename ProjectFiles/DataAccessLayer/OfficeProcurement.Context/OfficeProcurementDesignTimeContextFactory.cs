@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace OfficeProcurement.Context;
 
-
+/// <summary>
+/// Фабрика для создания экземпляра <see cref="OfficeProcurementContext"/>
+/// Используется инструментами EF Core для выполнения миграций и обновления базы данных
+/// </summary>
 public class OfficeProcurementDesignTimeContextFactory : IDesignTimeDbContextFactory<OfficeProcurementContext>
 {
     /// <summary>
@@ -16,6 +19,11 @@ public class OfficeProcurementDesignTimeContextFactory : IDesignTimeDbContextFac
     /// 4) dotnet ef database update --project DataAccessLayer/OfficeProcurement.Context/OfficeProcurement.Context.csproj
     /// 5) dotnet ef database update [targetMigrationName] --project DataAccessLayer/OfficeProcurement.Context/OfficeProcurement.Context.csproj
     /// </remarks>
+
+    /// <summary>
+    /// Создаёт новый экземпляр <see cref="OfficeProcurementContext"/>
+    /// для использования инструментами EF Core во время разработки
+    /// </summary>
     public OfficeProcurementContext CreateDbContext(string[] args)
     {
         var connectionString = "Host=localhost;Port=5432;Database=OfficeProcurement;Username=postgres;Password=Qwerty54321";

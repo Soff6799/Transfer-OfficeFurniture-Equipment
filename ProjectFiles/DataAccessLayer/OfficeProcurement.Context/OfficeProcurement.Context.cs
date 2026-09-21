@@ -4,6 +4,9 @@ using OfficeProcurement.Dal.Contracts.Repositories;
 
 namespace OfficeProcurement.Context;
 
+/// <summary>
+/// Контекст базы данных. Предоставляет доступ к наборам сущностей и реализует паттерны
+/// </summary>
 public class OfficeProcurementContext : DbContext,
     IReader,
     IWriter,
