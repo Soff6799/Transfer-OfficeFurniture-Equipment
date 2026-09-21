@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OfficeProcurement.Dal.Contracts;
+using OfficeProcurement.Dal.Contracts.Interfaces;
 
 namespace OfficeProcurement.Context.EntityFrameworkCore;
 
