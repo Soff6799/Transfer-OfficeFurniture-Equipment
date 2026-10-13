@@ -5,7 +5,7 @@ namespace OfficeProcurement.Entities;
 /// <summary>
 /// Сущность поставщик
 /// </summary>
-public class Supplier: BaseAuditEntity
+public class Supplier : BaseAuditEntity
 {
     /// <summary>
     /// Название компании

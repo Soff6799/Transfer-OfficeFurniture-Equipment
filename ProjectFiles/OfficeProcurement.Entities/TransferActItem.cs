@@ -5,7 +5,7 @@ namespace OfficeProcurement.Entities;
 /// <summary>
 /// Сущность содержимого акта
 /// </summary>
-public class TransferActItem: BaseAuditEntity
+public class TransferActItem : BaseAuditEntity
 {
     /// <summary>
     /// Название
@@ -15,7 +15,7 @@ public class TransferActItem: BaseAuditEntity
     /// <summary>
     /// Складской номер
     /// </summary>
-    public string? StockNumber  { get; set; }
+    public string? StockNumber { get; set; }
 
     /// <summary>
     /// Заводские характеристики (Цвет: серый, 100x50x70)
@@ -40,7 +40,7 @@ public class TransferActItem: BaseAuditEntity
     /// <summary>
     /// Общая стоимость
     /// </summary>
-    public decimal GetTotalAmount()=> Quantity * UnitPrice;
+    public decimal GetTotalAmount() => Quantity * UnitPrice;
 
     /// <summary>
     /// НДС

@@ -5,22 +5,22 @@ namespace OfficeProcurement.Entities;
 /// <summary>
 /// Сущность Договора
 /// </summary>
-public class Contract: BaseAuditEntity
+public class Contract : BaseAuditEntity
 {
     /// <summary>
     /// Номер договора
     /// </summary>
-    public string Number { get; set; } =  string.Empty;
+    public string Number { get; set; } = string.Empty;
 
     /// <summary>
     /// Дата подписания
     /// </summary>
-    public DateTimeOffset SignedAt  { get; set; }
+    public DateTimeOffset SignedAt { get; set; }
 
     /// <summary>
     /// тип текущего договора
     /// </summary>
-    public ContractType Type  { get; set; }
+    public ContractType Type { get; set; }
 }
 
 /// <summary>
