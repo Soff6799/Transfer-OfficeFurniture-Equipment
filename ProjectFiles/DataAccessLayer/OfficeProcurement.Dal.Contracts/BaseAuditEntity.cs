@@ -1,8 +1,8 @@
-﻿using OfficeProcurement.Dal.Contracts.Interfaces;
+using OfficeProcurement.Dal.Contracts.Interfaces;
 
 namespace OfficeProcurement.Dal.Contracts;
 
-public abstract class BaseAuditEntity : IEntityWithId, IEntityAuditCreated, IEntityAuditUpdate, IEntityAuditDeletedAt
+public abstract class BaseAuditEntity : IEntity, IEntityWithId, IEntityAuditCreated, IEntityAuditUpdate, IEntityAuditDeletedAt
 {
     /// <summary>
     /// Идентификатор

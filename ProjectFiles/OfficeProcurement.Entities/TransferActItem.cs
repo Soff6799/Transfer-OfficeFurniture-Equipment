@@ -3,7 +3,7 @@ using OfficeProcurement.Dal.Contracts;
 namespace OfficeProcurement.Entities;
 
 /// <summary>
-/// Сущность содержимого акта
+/// Сущность содержимого акта (Строка)
 /// </summary>
 public class TransferActItem : BaseAuditEntity
 {
