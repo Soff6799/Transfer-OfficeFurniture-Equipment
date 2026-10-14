@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Services"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Services.Contracts", "OfficeProcurement.Services.Contracts\OfficeProcurement.Services.Contracts.csproj", "{DA149F55-D3AF-4ABA-96A9-CDC2F21E8489}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeProcurement.Common", "OfficeProcurement.Common\OfficeProcurement.Common.csproj", "{3A20FAD0-03A8-4105-B2F5-55139CC6E975}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,18 @@ Global
 		{DA149F55-D3AF-4ABA-96A9-CDC2F21E8489}.Release|x64.Build.0 = Release|Any CPU
 		{DA149F55-D3AF-4ABA-96A9-CDC2F21E8489}.Release|x86.ActiveCfg = Release|Any CPU
 		{DA149F55-D3AF-4ABA-96A9-CDC2F21E8489}.Release|x86.Build.0 = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|x64.Build.0 = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|x64.ActiveCfg = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|x64.Build.0 = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A20FAD0-03A8-4105-B2F5-55139CC6E975}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
