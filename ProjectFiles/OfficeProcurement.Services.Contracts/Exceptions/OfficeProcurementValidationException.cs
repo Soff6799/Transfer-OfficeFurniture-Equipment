@@ -4,7 +4,7 @@ namespace OfficeProcurement.Services.Contracts.Exceptions;
 /// <summary>
 /// Исключение, выбрасываемое при ошибках валидации модели
 /// </summary>
-public class FinalExerciseValidationException : OfficeProcurementException
+public class OfficeProcurementValidationException : OfficeProcurementException
 {
     /// <summary>
     /// Ошибки
@@ -15,7 +15,7 @@ public class FinalExerciseValidationException : OfficeProcurementException
     /// Инициализирует новый экземпляр исключения со списком ошибок валидации
     /// </summary>
     /// <param name="errors">Список ошибок валидации</param>
-    public FinalExerciseValidationException(IEnumerable<InvalidateItemModel> errors)
+    public OfficeProcurementValidationException(IEnumerable<InvalidateItemModel> errors)
     {
         Errors = errors;
     }
