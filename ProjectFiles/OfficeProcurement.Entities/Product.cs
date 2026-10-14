@@ -1,11 +1,11 @@
-﻿using OfficeProcurement.Dal.Contracts;
+using OfficeProcurement.Dal.Contracts;
 
 namespace OfficeProcurement.Entities;
 
 /// <summary>
 /// Сущность товара
 /// </summary>
-public class Product: BaseAuditEntity
+public class Product : BaseAuditEntity
 {
     /// <summary>
     /// Название
@@ -15,7 +15,7 @@ public class Product: BaseAuditEntity
     /// <summary>
     /// Складской номер
     /// </summary>
-    public string? StockNumber  { get; set; }
+    public string? StockNumber { get; set; }
 
     /// <summary>
     /// Заводские характеристики (Цвет: серый, 100x50x70)

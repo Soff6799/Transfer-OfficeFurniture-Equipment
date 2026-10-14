@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OfficeProcurement.Dal.Contracts.Interfaces;
 
 namespace OfficeProcurement.Context.EntityFrameworkCore;
@@ -26,7 +26,7 @@ public static class EntityTypeBuilderExtensions
     }
 
     /// <summary>
-    /// Задаёт конфигурацию свойств полного аудита для сущности <see cref="IEntityAuditUpdate"/>
+    /// Задаёт конфигурацию свойств полного аудита обновления для сущности <see cref="IEntityAuditUpdate"/>
     /// </summary>
     public static void UpdateAuditConfiguration<T>(this EntityTypeBuilder<T> builder)
         where T : class, IEntityAuditUpdate

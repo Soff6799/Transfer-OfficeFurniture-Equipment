@@ -5,7 +5,7 @@ namespace OfficeProcurement.Entities;
 /// <summary>
 /// Сущность клиента
 /// </summary>
-public class Client: BaseAuditEntity
+public class Client : BaseAuditEntity
 {
     /// <summary>
     /// Название компании
