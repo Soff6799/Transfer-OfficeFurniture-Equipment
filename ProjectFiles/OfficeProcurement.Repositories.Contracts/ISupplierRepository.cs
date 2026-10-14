@@ -26,7 +26,7 @@ namespace OfficeProcurement.Repositories.Contracts
         /// <summary>
         /// Получает сущность поставщика по названию компании
         /// </summary>
-        /// <param name="CompanyName"></param>
+        /// <param name="CompanyName">Название компании</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность поставщика или <c>null</c>, если не найдена</returns>
         Task<Supplier?> GetSupplierByCompanyNameAsync(string companyName, CancellationToken cancellationToken);

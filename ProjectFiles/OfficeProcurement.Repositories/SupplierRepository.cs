@@ -14,7 +14,7 @@ namespace OfficeProcurement.Repositories
         private readonly IReader reader;
 
         /// <summary>
-        /// Инициализирует новый экземпляр<see cref="SupplierRepository"/>.
+        /// Инициализирует новый экземпляр<see cref="SupplierRepository"/>
         /// </summary>
         /// <param name="writerContext">Контекст репозитория записи сущностей</param>
         /// <param name="reader">Читатель сущностей из контекста</param>
