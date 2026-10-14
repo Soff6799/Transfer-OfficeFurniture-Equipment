@@ -3,10 +3,6 @@ using OfficeProcurement.Context.Repository;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OfficeProcurement.Repositories
 {
