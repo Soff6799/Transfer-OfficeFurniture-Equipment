@@ -2,8 +2,8 @@ using AutoMapper;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
-using OfficeProcurement.Services.Contracts;
 using OfficeProcurement.Services.Contracts.Exceptions;
+using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Contracts.Models;
 
 namespace OfficeProcurement.Services;

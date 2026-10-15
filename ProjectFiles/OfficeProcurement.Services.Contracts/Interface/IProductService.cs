@@ -1,6 +1,6 @@
 using OfficeProcurement.Services.Contracts.Models;
 
-namespace OfficeProcurement.Services.Contracts;
+namespace OfficeProcurement.Services.Contracts.Interface;
 
 /// <summary>
 /// Сервис для работы с продуктами
