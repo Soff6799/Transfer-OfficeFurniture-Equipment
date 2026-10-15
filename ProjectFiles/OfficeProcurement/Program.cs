@@ -1,9 +1,11 @@
-using OfficeProcurement.Services.Automapper;
-using OfficeProcurement.Entities;
+using OfficeProcurement.Dal.Contracts.Repositories;
+using OfficeProcurement.Repositories;
 using OfficeProcurement.Repositories.Contracts;
-
 using OfficeProcurement.Services;
+using OfficeProcurement.Services.Automapper;
 using OfficeProcurement.Services.Contracts.Interface;
+using OfficeProcurement.Context;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -11,6 +13,19 @@ builder.Services.AddAutoMapper(x =>
 {
     x.AddProfile<ServiceProfile>();
 });
+
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IContractRepository, ContractRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ITransferActRepository, TransferActRepository>();
+builder.Services.AddScoped<ITransferActItemRepository, TransferActItemRepository>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<OfficeProcurementContext>(opts =>
+    opts.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IUnitOfWork>(x => x.GetRequiredService<OfficeProcurementContext>());
 
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IContractService, ContractService>();
