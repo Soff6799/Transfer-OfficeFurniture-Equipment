@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OfficeProcurement.Entities\OfficeProcurement.Entities.csproj" />
+    <ProjectReference Include="..\OfficeProcurement.Repositories.Contracts\OfficeProcurement.Repositories.Contracts.csproj" />
+    <ProjectReference Include="..\OfficeProcurement.Services.Contracts\OfficeProcurement.Services.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
