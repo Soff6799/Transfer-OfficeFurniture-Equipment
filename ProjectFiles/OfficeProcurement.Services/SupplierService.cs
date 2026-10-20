@@ -54,11 +54,11 @@ public class SupplierService : ISupplierService
     /// </summary>
     async Task<SupplierModel> ISupplierService.CreateSupplier(SupplierCreateModel supplierCreateModel, CancellationToken cancellationToken)
     {
-        var existing = await supplierRepository.GetSupplierByCompanyNameAsync(supplierCreateModel.CompanyName, cancellationToken);
+        var existing = await supplierRepository.GetSupplierByInnAsync(supplierCreateModel.Inn, cancellationToken);
 
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Поставщик с названием '{supplierCreateModel.CompanyName}' уже существует");
+            throw new OfficeProcurementInvalidOperationException($"Поставщик с ИНН '{supplierCreateModel.Inn}' уже существует");
         }
         var entity = mapper.Map<Supplier>(supplierCreateModel);
         supplierRepository.Add(entity);
@@ -72,11 +72,11 @@ public class SupplierService : ISupplierService
     /// </summary>
     async Task ISupplierService.UpdateSupplier(SupplierModel supplierModel, CancellationToken cancellationToken)
     {
-        var existing = await supplierRepository.GetSupplierByCompanyNameAsync(supplierModel.CompanyName, cancellationToken);
+        var existing = await supplierRepository.GetSupplierByInnAsync(supplierModel.Inn, cancellationToken);
 
         if (existing is not null && existing.Id != supplierModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Поставщик с названием '{supplierModel.CompanyName}' уже существует");
+            throw new OfficeProcurementInvalidOperationException($"Поставщик с ИНН '{supplierModel.Inn}' уже существует");
         }
         var entity = await supplierRepository.GetSupplierByIdAsync(supplierModel.Id, cancellationToken);
 

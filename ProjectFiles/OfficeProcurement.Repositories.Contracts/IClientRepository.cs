@@ -24,11 +24,8 @@ namespace OfficeProcurement.Repositories.Contracts
         Task<Client?> GetClientByIdAsync(Guid id, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Получает сущность клиента по названию компании
+        /// Получает сущность клиента по ИНН
         /// </summary>
-        /// <param name="companyName">Название компании</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Сущность клиента или <c>null</c>, если не найдена</returns>
-        Task<Client?> GetClientByCompanyNameAsync(string companyName, CancellationToken cancellationToken);
+        Task<Client?> GetClientByInnAsync(string inn, CancellationToken cancellationToken);
     }
 }
