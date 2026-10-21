@@ -54,10 +54,13 @@ public class ProductService : IProductService
     /// </summary>
     async Task<ProductModel> IProductService.CreateProduct(ProductCreateModel productCreateModel, CancellationToken cancellationToken)
     {
-        var existing = await productRepository.GetProductByNameAsync(productCreateModel.Name, cancellationToken);
-        if (existing is not null)
+        if (productCreateModel.StockNumber is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Продукт с названием '{productCreateModel.Name}' уже существует");
+            var existing = await productRepository.GetProductByStockNumberAsync(productCreateModel.StockNumber, cancellationToken);
+            if (existing is not null)
+            {
+                throw new OfficeProcurementInvalidOperationException($"Продукт со складским номером '{productCreateModel.StockNumber}' уже существует");
+            }
         }
         var entity = mapper.Map<Product>(productCreateModel);
         productRepository.Add(entity);
@@ -71,10 +74,13 @@ public class ProductService : IProductService
     /// </summary>
     async Task IProductService.UpdateProduct(ProductModel productModel, CancellationToken cancellationToken)
     {
-        var existing = await productRepository.GetProductByNameAsync(productModel.Name, cancellationToken);
-        if (existing is not null && existing.Id != productModel.Id)
+        if (productModel.StockNumber is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Продукт с названием '{productModel.Name}' уже существует");
+            var existing = await productRepository.GetProductByStockNumberAsync(productModel.StockNumber, cancellationToken);
+            if (existing is not null && existing.Id != productModel.Id)
+            {
+                throw new OfficeProcurementInvalidOperationException($"Продукт со складским номером '{productModel.StockNumber}' уже существует");
+            }
         }
         var entity = await productRepository.GetProductByIdAsync(productModel.Id, cancellationToken);
         if (entity is null)

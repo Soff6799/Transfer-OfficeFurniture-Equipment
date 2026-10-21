@@ -24,11 +24,11 @@ namespace OfficeProcurement.Repositories.Contracts
         Task<TransferActItem?> GetTransferActItemByIdAsync(Guid id, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Получает строку содержимого акта по названию продукта
+        /// Получает сущность позиции акта по складскому номеру
         /// </summary>
-        /// <param name="Name">название продукта</param>
+        /// <param name="stockNumber">Складской номер позиции</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность содержимого акта или <c>null</c>, если не найдена</returns>
-        Task<TransferActItem?> GetTransferActItemByNameAsync(string name, CancellationToken cancellationToken);
+        Task<TransferActItem?> GetTransferActItemByStockNumberAsync(string stockNumber, CancellationToken cancellationToken);
     }
 }

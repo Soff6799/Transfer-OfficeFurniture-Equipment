@@ -39,10 +39,8 @@ namespace OfficeProcurement.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
 
         /// <inheritdoc/>
-        public Task<Product?> GetProductByNameAsync(string name, CancellationToken cancellationToken)
+        public Task<Product?> GetProductByStockNumberAsync(string stockNumber, CancellationToken cancellationToken)
             => reader.Read<Product>()
-                .NotDeletedAt()
-                .Where(x => x.Name.Contains(name))
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(x => x.StockNumber == stockNumber, cancellationToken);
     }
 }
