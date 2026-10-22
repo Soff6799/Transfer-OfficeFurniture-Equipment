@@ -1,5 +1,5 @@
 using OfficeProcurement.Common;
-namespace APIProject.Models
+namespace OfficeProcurement.Models
 {
     /// <summary>
     /// модель ответа с ошибками валидации

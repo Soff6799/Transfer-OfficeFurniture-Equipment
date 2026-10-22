@@ -1,4 +1,4 @@
-namespace APIProject.Models
+namespace OfficeProcurement.Models
 {
     /// <summary>
     /// Модель ответа с ошибкой
@@ -8,6 +8,6 @@ namespace APIProject.Models
         /// <summary>
         /// сообщение об ошибке
         /// </summary>
-        public string Massage {  get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
     }
 }
