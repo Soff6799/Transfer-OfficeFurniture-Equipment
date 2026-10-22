@@ -1,3 +1,4 @@
+using OfficeProcurement.Automapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -24,6 +25,7 @@ builder.Services.AddSingleton<IIdentityProvider, IdentityProvider>();
 builder.Services.AddAutoMapper(x =>
 {
     x.AddProfile<ServiceProfile>();
+    x.AddProfile<ApiProfile>();
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
