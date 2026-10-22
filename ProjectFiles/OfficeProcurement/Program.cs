@@ -1,11 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using OfficeProcurement.Common;
+using OfficeProcurement.Context;
 using OfficeProcurement.Dal.Contracts.Repositories;
+using OfficeProcurement.Implementations.ValidateService;
 using OfficeProcurement.Repositories;
 using OfficeProcurement.Repositories.Contracts;
 using OfficeProcurement.Services;
 using OfficeProcurement.Services.Automapper;
 using OfficeProcurement.Services.Contracts.Interface;
-using OfficeProcurement.Context;
-using Microsoft.EntityFrameworkCore;
+using OfficeProcurement.Services.Validators.Client;
+using FluentValidation;
+using OfficeProcurement.Implementations;
+using OfficeProcurement.Services.Validators;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -33,6 +39,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ITransferActItemService, TransferActItemService>();
 builder.Services.AddScoped<ITransferActService, TransferActService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<ClientCreateModelValidator>();
+builder.Services.AddScoped<IValidateService, ValidateService>();
 
 builder.Services.AddOpenApi();
 
