@@ -24,11 +24,11 @@ namespace OfficeProcurement.Repositories.Contracts
         Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Получает продукт по названию
+        /// Получает продукт по складскому номеру
         /// </summary>
-        /// <param name="name">название продукта</param>
+        /// <param name="stockNumber">Складской номер продукта</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность продукта или <c>null</c>, если не найдена</returns>
-        Task<Product?> GetProductByNameAsync(string name, CancellationToken cancellationToken);
+        Task<Product?> GetProductByStockNumberAsync(string stockNumber, CancellationToken cancellationToken);
     }
 }

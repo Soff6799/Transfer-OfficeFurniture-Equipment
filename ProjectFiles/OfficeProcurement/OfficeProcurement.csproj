@@ -1,18 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
-        <PublishAot>true</PublishAot>
+        <PublishAot>false</PublishAot>
         <RootNamespace>APIProject</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.11" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
-        <PackageReference Include="Microsoft.OpenApi" Version="2.3.9" />
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DataAccessLayer\OfficeProcurement.Context.Repository\OfficeProcurement.Context.Repository.csproj" />
+      <ProjectReference Include="..\DataAccessLayer\OfficeProcurement.Context\OfficeProcurement.Context.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Common\OfficeProcurement.Common.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Entities\OfficeProcurement.Entities.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Repositories.Contracts\OfficeProcurement.Repositories.Contracts.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Repositories\OfficeProcurement.Repositories.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Services.Contracts\OfficeProcurement.Services.Contracts.csproj" />
+      <ProjectReference Include="..\OfficeProcurement.Services\OfficeProcurement.Services.csproj" />
     </ItemGroup>
 
 </Project>

@@ -56,10 +56,13 @@ public class TransferActItemService : ITransferActItemService
     /// </summary>
     async Task<TransferActItemModel> ITransferActItemService.CreateTransferActItem(TransferActItemCreateModel transferActItemCreateModel, CancellationToken cancellationToken)
     {
-        var existing = await transferActItemRepository.GetTransferActItemByNameAsync(transferActItemCreateModel.Name, cancellationToken);
-        if (existing is not null)
+        if (transferActItemCreateModel.StockNumber is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Позиция с названием '{transferActItemCreateModel.Name}' уже существует");
+            var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemCreateModel.StockNumber, cancellationToken);
+            if (existing is not null)
+            {
+                throw new OfficeProcurementInvalidOperationException($"Позиция со складским номером '{transferActItemCreateModel.StockNumber}' уже существует");
+            }
         }
         var entity = mapper.Map<TransferActItem>(transferActItemCreateModel);
         transferActItemRepository.Add(entity);
@@ -73,10 +76,13 @@ public class TransferActItemService : ITransferActItemService
     /// </summary>
     async Task ITransferActItemService.UpdateTransferActItem(TransferActItemModel transferActItemModel, CancellationToken cancellationToken)
     {
-        var existing = await transferActItemRepository.GetTransferActItemByNameAsync(transferActItemModel.Name, cancellationToken);
-        if (existing is not null && existing.Id != transferActItemModel.Id)
+        if (transferActItemModel.StockNumber is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Позиция с названием '{transferActItemModel.Name}' уже существует");
+            var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemModel.StockNumber, cancellationToken);
+            if (existing is not null && existing.Id != transferActItemModel.Id)
+            {
+                throw new OfficeProcurementInvalidOperationException($"Позиция со складским номером '{transferActItemModel.StockNumber}' уже существует");
+            }
         }
         var entity = await transferActItemRepository.GetTransferActItemByIdAsync(transferActItemModel.Id, cancellationToken);
         if (entity is null)

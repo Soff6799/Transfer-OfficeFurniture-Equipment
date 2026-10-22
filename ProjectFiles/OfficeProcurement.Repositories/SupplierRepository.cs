@@ -39,10 +39,8 @@ namespace OfficeProcurement.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
 
         /// <inheritdoc/>
-        public Task<Supplier?> GetSupplierByCompanyNameAsync(string companyName, CancellationToken cancellationToken)
+        public Task<Supplier?> GetSupplierByInnAsync(string inn, CancellationToken cancellationToken)
             => reader.Read<Supplier>()
-                .NotDeletedAt()
-                .Where(x => x.CompanyName.Contains(companyName))
-                .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(x => x.Inn == inn, cancellationToken);
     }
 }

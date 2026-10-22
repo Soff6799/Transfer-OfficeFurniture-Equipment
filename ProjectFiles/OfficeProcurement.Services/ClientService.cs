@@ -55,10 +55,10 @@ public class ClientService : IClientService
     /// <exception cref="OfficeProcurementInvalidOperationException">Клиент с таким названием уже существует</exception>
     async Task<ClientModel> IClientService.CreateClient(ClientCreateModel clientCreateModel, CancellationToken cancellationToken)
     {
-        var existing = await clientRepository.GetClientByCompanyNameAsync(clientCreateModel.CompanyName, cancellationToken);
+        var existing = await clientRepository.GetClientByInnAsync(clientCreateModel.Inn, cancellationToken);
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Клиент с названием '{clientCreateModel.CompanyName}' уже существует");
+            throw new OfficeProcurementInvalidOperationException($"Клиент с ИНН '{clientCreateModel.Inn}' уже существует");
         }
         var entity = mapper.Map<Client>(clientCreateModel);
         clientRepository.Add(entity);
@@ -72,10 +72,10 @@ public class ClientService : IClientService
     /// </summary>
     async Task IClientService.UpdateClient(ClientModel clientModel, CancellationToken cancellationToken)
     {
-        var existing = await clientRepository.GetClientByCompanyNameAsync(clientModel.CompanyName, cancellationToken);
-        if (existing is not null && existing.Id != clientModel.Id)
+        var existingByInn = await clientRepository.GetClientByInnAsync(clientModel.Inn, cancellationToken);
+        if (existingByInn is not null && existingByInn.Id != clientModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Клиент с названием '{clientModel.CompanyName}' уже существует");
+            throw new OfficeProcurementInvalidOperationException($"Клиент с ИНН '{clientModel.Inn}' уже существует");
         }
         var entity = await clientRepository.GetClientByIdAsync(clientModel.Id, cancellationToken);
         if (entity is null)

@@ -7,7 +7,7 @@ namespace OfficeProcurement.Entities.Configurations;
 /// <summary>
 /// Конфигурация сущности <see cref="Product"/> для  Entity Framework Core
 /// </summary>
-public class ProductConfiguration: IEntityTypeConfiguration<Product>
+public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     /// <summary>
     /// Настраивает правила отображения полей сущности, индексы
