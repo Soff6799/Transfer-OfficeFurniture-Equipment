@@ -1,11 +1,14 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using OfficeProcurement.Common;
 using OfficeProcurement.Context;
+using OfficeProcurement.Context.Repository;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Implementations.ValidateService;
 using OfficeProcurement.Infrastructure;
+using OfficeProcurement.Infrastructure.Common;
+using OfficeProcurement.Infrastructure.Providers;
 using OfficeProcurement.Repositories;
 using OfficeProcurement.Repositories.Contracts;
 using OfficeProcurement.Services;
@@ -14,6 +17,9 @@ using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Validators.Client;
 
 var builder = WebApplication.CreateSlimBuilder(args);
+
+builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+builder.Services.AddSingleton<IIdentityProvider, IdentityProvider>();
 
 builder.Services.AddAutoMapper(x =>
 {
@@ -25,6 +31,10 @@ builder.Services.AddDbContext<OfficeProcurementContext>(opts =>
     opts.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IUnitOfWork>(x => x.GetRequiredService<OfficeProcurementContext>());
+
+builder.Services.AddScoped<IReader>(x => x.GetRequiredService<OfficeProcurementContext>());
+builder.Services.AddScoped<IWriter>(x => x.GetRequiredService<OfficeProcurementContext>());
+builder.Services.AddScoped<IDbWriterContext, DbWriterContext>();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
@@ -60,11 +70,14 @@ builder.Services.AddControllers(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Office Procurement API v1");
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Office Procurement API v1");
+    });
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
