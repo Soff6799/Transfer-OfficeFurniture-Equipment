@@ -1,17 +1,17 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using OfficeProcurement.Common;
 using OfficeProcurement.Context;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Implementations.ValidateService;
+using OfficeProcurement.Infrastructure;
 using OfficeProcurement.Repositories;
 using OfficeProcurement.Repositories.Contracts;
 using OfficeProcurement.Services;
 using OfficeProcurement.Services.Automapper;
 using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Validators.Client;
-using FluentValidation;
-using OfficeProcurement.Implementations;
-using OfficeProcurement.Services.Validators;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -43,14 +43,28 @@ builder.Services.AddScoped<ITransferActService, TransferActService>();
 builder.Services.AddValidatorsFromAssemblyContaining<ClientCreateModelValidator>();
 builder.Services.AddScoped<IValidateService, ValidateService>();
 
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Office Procurement API",
+        Version = "v1",
+        Description = "API для управления офисными закупками"
+    });
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ExceptionFilter>();
+});
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.MapOpenApi();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Office Procurement API v1");
+});
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
