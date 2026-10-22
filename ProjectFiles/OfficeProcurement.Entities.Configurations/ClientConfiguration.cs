@@ -7,7 +7,7 @@ namespace OfficeProcurement.Entities.Configurations;
 /// <summary>
 /// Конфигурация сущности <see cref="Client"/> для  Entity Framework Core
 /// </summary>
-public class ClientConfiguration: IEntityTypeConfiguration<Client>
+public class ClientConfiguration : IEntityTypeConfiguration<Client>
 {
     /// <summary>
     /// Настраивает правила отображения полей сущности, индексы

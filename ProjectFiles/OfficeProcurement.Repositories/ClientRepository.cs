@@ -1,3 +1,4 @@
+using System.Reflection.PortableExecutable;
 using Microsoft.EntityFrameworkCore;
 using OfficeProcurement.Context.Repository;
 using OfficeProcurement.Dal.Contracts.Repositories;
@@ -39,10 +40,8 @@ namespace OfficeProcurement.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
 
         /// <inheritdoc/>
-        public Task<Client?> GetClientByCompanyNameAsync(string companyName, CancellationToken cancellationToken)
+        public Task<Client?> GetClientByInnAsync(string inn, CancellationToken cancellationToken)
             => reader.Read<Client>()
-                .NotDeletedAt()
-                .Where(x => x.CompanyName.Contains(companyName))
-                .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(x => x.Inn == inn, cancellationToken);
     }
 }

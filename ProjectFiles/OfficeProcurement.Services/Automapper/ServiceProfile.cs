@@ -2,7 +2,7 @@ using AutoMapper;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Services.Contracts.Models;
 
-namespace FinalExercise.Services.Automapper;
+namespace OfficeProcurement.Services.Automapper;
 
 public class ServiceProfile : Profile
 {
