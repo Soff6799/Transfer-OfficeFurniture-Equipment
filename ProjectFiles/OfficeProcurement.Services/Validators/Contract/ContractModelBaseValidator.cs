@@ -14,11 +14,19 @@ public abstract class ContractModelBaseValidator<T> : AbstractValidator<T>
     /// </summary>
     protected ContractModelBaseValidator()
     {
+        RuleFor(x => x.ClientId)
+            .NotEmpty().WithMessage("Идентификатор клиента обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор клиента не может быть пустым");
+
+        RuleFor(x => x.SupplierId)
+            .NotEmpty().WithMessage("Идентификатор поставщика обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор поставщика не может быть пустым");
+
         RuleFor(x => x.Number)
             .NotEmpty().WithMessage("Номер договора обязателен")
             .MaximumLength(50).WithMessage("Номер договора не должен превышать 50 символов");
 
-        RuleFor(x => x.SignedAt)
+        RuleFor(x => x.Date)
             .NotEmpty().WithMessage("Дата подписания обязательна");
 
         RuleFor(x => x.Type)

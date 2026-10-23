@@ -30,5 +30,10 @@ namespace OfficeProcurement.Repositories.Contracts
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность акта или <c>null</c>, если не найдена</returns>
         Task<TransferAct?> GetTransferActByNumberAsync(string number, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Получает акт передачи с договором по идентификатору
+        /// </summary>
+        Task<TransferAct?> GetTransferActWithContractByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }

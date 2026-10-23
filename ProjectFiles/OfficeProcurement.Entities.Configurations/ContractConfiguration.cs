@@ -20,6 +20,16 @@ public class ContractConfiguration : IEntityTypeConfiguration<Contract>
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
 
+        builder.HasOne(x => x.Client)
+            .WithMany()
+            .HasForeignKey(x => x.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Supplier)
+            .WithMany()
+            .HasForeignKey(x => x.SupplierId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(x => x.Number)
             .IsRequired()
             .HasMaxLength(50);

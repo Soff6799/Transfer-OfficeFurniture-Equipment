@@ -8,6 +8,26 @@ namespace OfficeProcurement.Entities;
 public class TransferActItem : BaseAuditEntity
 {
     /// <summary>
+    /// Идентификатор акта передачи
+    /// </summary>
+    public Guid TransferActId { get; set; }
+
+    /// <summary>
+    /// Навигационное свойство к акту передачи
+    /// </summary>
+    public virtual TransferAct? TransferAct { get; set; }
+
+    /// <summary>
+    /// Идентификатор продукта
+    /// </summary>
+    public Guid ProductId { get; set; }
+
+    /// <summary>
+    /// Навигационное свойство к продукту
+    /// </summary>
+    public virtual Product? Product { get; set; }
+
+    /// <summary>
     /// Название
     /// </summary>
     public string Name { get; set; } = string.Empty;

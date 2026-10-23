@@ -5,6 +5,8 @@ namespace OfficeProcurement.Services.Contracts.Models;
 /// </summary>
 public class SupplierCreateModel
 {
+    public Guid SupplierId { get; set; }
+
     /// <summary>
     /// Название компании
     /// </summary>

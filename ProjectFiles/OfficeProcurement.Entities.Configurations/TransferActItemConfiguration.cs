@@ -7,7 +7,7 @@ namespace OfficeProcurement.Entities.Configurations;
 /// <summary>
 /// Конфигурация сущности <see cref="TransferActItem"/> для  Entity Framework Core
 /// </summary>
-public class TransferActItemConfiguration: IEntityTypeConfiguration<TransferActItem>
+public class TransferActItemConfiguration : IEntityTypeConfiguration<TransferActItem>
 {
     /// <summary>
     /// Настраивает правила отображения полей сущности,
@@ -19,6 +19,16 @@ public class TransferActItemConfiguration: IEntityTypeConfiguration<TransferActI
         builder.HasIdAsKey();
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
+
+        builder.HasOne(x => x.TransferAct)
+            .WithMany()
+            .HasForeignKey(x => x.TransferActId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.Name)
             .IsRequired()

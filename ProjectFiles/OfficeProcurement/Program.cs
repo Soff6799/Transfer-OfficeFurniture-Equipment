@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -16,8 +17,8 @@ using OfficeProcurement.Services;
 using OfficeProcurement.Services.Automapper;
 using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Contracts.Models;
+using OfficeProcurement.Services.Implementations;
 using OfficeProcurement.Services.Validators.Client;
-using System.Reflection;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -53,6 +54,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ITransferActItemService, TransferActItemService>();
 builder.Services.AddScoped<ITransferActService, TransferActService>();
+
+builder.Services.AddScoped<ITransferActExcelService, TransferActExcelService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(ClientCreateModelValidator).Assembly);
 builder.Services.AddScoped<IValidateService, ValidateService>();

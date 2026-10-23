@@ -30,5 +30,13 @@ namespace OfficeProcurement.Repositories.Contracts
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность содержимого акта или <c>null</c>, если не найдена</returns>
         Task<TransferActItem?> GetTransferActItemByStockNumberAsync(string stockNumber, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Получает все позиции акта передачи по идентификатору акта
+        /// </summary>
+        /// <param name="transferActId">Идентификатор акта передачи</param>
+        /// <param name="cancellationToken">Токен отмены операции</param>
+        /// <returns>Коллекция позиций акта</returns>
+        Task<IReadOnlyCollection<TransferActItem>> GetTransferActItemsByTransferActIdAsync(Guid transferActId, CancellationToken cancellationToken);
     }
 }

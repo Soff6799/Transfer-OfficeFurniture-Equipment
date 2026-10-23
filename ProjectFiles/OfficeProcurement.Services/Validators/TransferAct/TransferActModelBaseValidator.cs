@@ -14,6 +14,10 @@ public abstract class TransferActModelBaseValidator<T> : AbstractValidator<T>
     /// </summary>
     protected TransferActModelBaseValidator()
     {
+        RuleFor(x => x.ContractId)
+            .NotEmpty().WithMessage("Идентификатор договора обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор договора не может быть пустым");
+
         RuleFor(x => x.Number)
             .NotEmpty().WithMessage("Номер акта обязателен")
             .MaximumLength(50).WithMessage("Номер акта не должен превышать 50 символов");

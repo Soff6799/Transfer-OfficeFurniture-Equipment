@@ -5,6 +5,10 @@ namespace OfficeProcurement.Models.TransferActItem;
 /// </summary>
 public class TransferActItemCreateApiModel
 {
+    public Guid TransferActId { get; set; }
+
+    public Guid ProductId { get; set; }
+
     /// <summary>
     /// Название позиции
     /// </summary>
