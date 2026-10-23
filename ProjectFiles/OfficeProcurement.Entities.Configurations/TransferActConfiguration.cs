@@ -7,7 +7,7 @@ namespace OfficeProcurement.Entities.Configurations;
 /// <summary>
 /// Конфигурация сущности <see cref="TransferAct"/> для  Entity Framework Core
 /// </summary>
-public class TransferActConfiguration: IEntityTypeConfiguration<TransferAct>
+public class TransferActConfiguration : IEntityTypeConfiguration<TransferAct>
 {
     /// <summary>
     /// Настраивает правила отображения полей сущности, индексы и ограничения для таблицы Акта
@@ -18,6 +18,11 @@ public class TransferActConfiguration: IEntityTypeConfiguration<TransferAct>
         builder.HasIdAsKey();
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
+
+        builder.HasOne(x => x.Contract)
+            .WithMany()
+            .HasForeignKey(x => x.ContractId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Number)
             .IsRequired()

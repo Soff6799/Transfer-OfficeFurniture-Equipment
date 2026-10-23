@@ -20,6 +20,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.CreateAuditConfiguration();
         builder.UpdateAuditConfiguration();
 
+        builder.HasOne(x => x.Supplier)
+            .WithMany()
+            .HasForeignKey(x => x.SupplierId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(100);

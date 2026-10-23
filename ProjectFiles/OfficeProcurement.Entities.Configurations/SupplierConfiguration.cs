@@ -7,7 +7,7 @@ namespace OfficeProcurement.Entities.Configurations;
 /// <summary>
 /// Конфигурация сущности <see cref="Supplier"/> для  Entity Framework Core
 /// </summary>
-public class SupplierConfiguration: IEntityTypeConfiguration<Supplier>
+public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 {
     /// <summary>
     /// Настраивает правила отображения полей сущности, индексы

@@ -112,6 +112,9 @@ namespace OfficeProcurement.Context.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -131,6 +134,9 @@ namespace OfficeProcurement.Context.Migrations
                     b.Property<DateTimeOffset>("SignedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -146,9 +152,13 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClientId");
+
                     b.HasIndex("Number")
                         .IsUnique()
                         .HasDatabaseName("IX_Contracts_Number");
+
+                    b.HasIndex("SupplierId");
 
                     b.ToTable("Contracts", (string)null);
                 });
@@ -186,6 +196,9 @@ namespace OfficeProcurement.Context.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Unit")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -207,6 +220,8 @@ namespace OfficeProcurement.Context.Migrations
                     b.HasIndex("StockNumber")
                         .IsUnique()
                         .HasDatabaseName("IX_Products_StockNumber");
+
+                    b.HasIndex("SupplierId");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -306,6 +321,9 @@ namespace OfficeProcurement.Context.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -334,6 +352,8 @@ namespace OfficeProcurement.Context.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
 
                     b.HasIndex("Number")
                         .IsUnique()
@@ -364,6 +384,9 @@ namespace OfficeProcurement.Context.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(8,3)");
 
@@ -374,6 +397,9 @@ namespace OfficeProcurement.Context.Migrations
                     b.Property<string>("StockNumber")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("TransferActId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -396,11 +422,75 @@ namespace OfficeProcurement.Context.Migrations
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_TransferActItems_Name");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("StockNumber")
                         .IsUnique()
                         .HasDatabaseName("IX_TransferActItems_StockNumber");
 
+                    b.HasIndex("TransferActId");
+
                     b.ToTable("TransferActItems", (string)null);
+                });
+
+            modelBuilder.Entity("OfficeProcurement.Entities.Contract", b =>
+                {
+                    b.HasOne("OfficeProcurement.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OfficeProcurement.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("OfficeProcurement.Entities.Product", b =>
+                {
+                    b.HasOne("OfficeProcurement.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("OfficeProcurement.Entities.TransferAct", b =>
+                {
+                    b.HasOne("OfficeProcurement.Entities.Contract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("OfficeProcurement.Entities.TransferActItem", b =>
+                {
+                    b.HasOne("OfficeProcurement.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OfficeProcurement.Entities.TransferAct", "TransferAct")
+                        .WithMany()
+                        .HasForeignKey("TransferActId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("TransferAct");
                 });
 #pragma warning restore 612, 618
         }

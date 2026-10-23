@@ -42,5 +42,14 @@ namespace OfficeProcurement.Repositories
         public Task<TransferActItem?> GetTransferActItemByStockNumberAsync(string stockNumber, CancellationToken cancellationToken)
             => reader.Read<TransferActItem>()
                 .FirstOrDefaultAsync(x => x.StockNumber == stockNumber, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<IReadOnlyCollection<TransferActItem>> GetTransferActItemsByTransferActIdAsync(Guid transferActId, CancellationToken cancellationToken)
+        {
+            var items = await reader.Read<TransferActItem>()
+                .Where(x => x.TransferActId == transferActId)
+                .ToListAsync(cancellationToken);
+            return items;
+        }
     }
 }

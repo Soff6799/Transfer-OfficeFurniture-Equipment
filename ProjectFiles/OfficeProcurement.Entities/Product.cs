@@ -8,6 +8,16 @@ namespace OfficeProcurement.Entities;
 public class Product : BaseAuditEntity
 {
     /// <summary>
+    /// Идентификатор поставщика
+    /// </summary>
+    public Guid SupplierId { get; set; }
+
+    /// <summary>
+    /// Навигационное свойство к поставщику
+    /// </summary>
+    public virtual Supplier? Supplier { get; set; }
+
+    /// <summary>
     /// Название
     /// </summary>
     public string Name { get; set; } = string.Empty;
