@@ -15,6 +15,10 @@ public abstract class ProductModelBaseValidator<T> : AbstractValidator<T>
     /// </summary>
     protected ProductModelBaseValidator()
     {
+        RuleFor(x => x.SupplierId)
+            .NotEmpty().WithMessage("Идентификатор поставщика обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор поставщика не может быть пустым");
+
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Название продукта обязательно")
             .MaximumLength(100).WithMessage("Название продукта не должно превышать 100 символов");
@@ -29,9 +33,7 @@ public abstract class ProductModelBaseValidator<T> : AbstractValidator<T>
             .NotEmpty().WithMessage("Единица измерения обязательна")
             .MaximumLength(20).WithMessage("Единица измерения не должна превышать 20 символов");
 
-        RuleFor(x => x.Price)
-            .GreaterThan(0).WithMessage("Цена должна быть больше нуля")
-            .Must(price => decimal.Round(price, 2) == price)
-            .WithMessage("Цена не может иметь больше 2 знаков после запятой");
+        RuleFor(x => x.UnitPrice)
+            .GreaterThan(0).WithMessage("Цена за единицу должна быть больше нуля");
     }
 }

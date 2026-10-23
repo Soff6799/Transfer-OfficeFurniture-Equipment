@@ -14,6 +14,14 @@ public abstract class TransferActItemModelBaseValidator<T> : AbstractValidator<T
     /// </summary>
     protected TransferActItemModelBaseValidator()
     {
+        RuleFor(x => x.TransferActId)
+            .NotEmpty().WithMessage("Идентификатор акта передачи обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор акта передачи не может быть пустым");
+
+        RuleFor(x => x.ProductId)
+            .NotEmpty().WithMessage("Идентификатор продукта обязателен")
+            .NotEqual(Guid.Empty).WithMessage("Идентификатор продукта не может быть пустым");
+
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Название позиции обязательно")
             .MaximumLength(100).WithMessage("Название позиции не должно превышать 100 символов");

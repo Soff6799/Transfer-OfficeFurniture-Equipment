@@ -5,6 +5,8 @@ namespace OfficeProcurement.Models.TransferAct;
 /// </summary>
 public class TransferActCreateApiModel
 {
+    public Guid ContractId { get; set; }
+
     /// <summary>
     /// Номер акта
     /// </summary>

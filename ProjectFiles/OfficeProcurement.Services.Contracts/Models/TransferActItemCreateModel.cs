@@ -5,6 +5,9 @@ namespace OfficeProcurement.Services.Contracts.Models;
 /// </summary>
 public class TransferActItemCreateModel
 {
+    public Guid TransferActId { get; set; }
+    public Guid ProductId { get; set; }
+
     /// <summary>
     /// Название позиции
     /// </summary>

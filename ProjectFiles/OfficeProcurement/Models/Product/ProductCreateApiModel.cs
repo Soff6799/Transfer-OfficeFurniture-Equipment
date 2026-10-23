@@ -5,6 +5,8 @@ namespace OfficeProcurement.Models.Product;
 /// </summary>
 public class ProductCreateApiModel
 {
+    public Guid SupplierId { get; set; }
+
     /// <summary>
     /// Название продукта
     /// </summary>

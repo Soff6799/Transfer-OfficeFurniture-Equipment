@@ -5,6 +5,8 @@ namespace OfficeProcurement.Services.Contracts.Models;
 /// </summary>
 public class ProductCreateModel
 {
+    public Guid SupplierId { get; set; }
+
     /// <summary>
     /// Название продукта
     /// </summary>
@@ -28,5 +30,5 @@ public class ProductCreateModel
     /// <summary>
     /// Цена
     /// </summary>
-    public decimal Price { get; set; }
+    public decimal UnitPrice { get; set; }
 }
