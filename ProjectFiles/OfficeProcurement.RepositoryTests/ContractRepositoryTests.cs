@@ -1,14 +1,13 @@
 using FluentAssertions;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
-using Xunit;
 
 namespace OfficeProcurement.Repositories.Tests;
 
 /// <summary>
 /// Тесты для <see cref="ContractRepository"/>
 /// </summary>
-public class ContractRepositoryTests : OfficeProcurementContextInMemory
+public class ContractRepositoryTests : BaseRepositoryTests
 {
     private readonly IContractRepository repository;
 
@@ -44,7 +43,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
         var contract2 = new Contract { Number = "Д-001", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
         var contract3 = new Contract { Number = "Д-002", SignedAt = DateTimeOffset.Now, Type = ContractType.Rent };
 
-        Context.AddRange(contract1, contract2, contract3);
+        AddRange(contract1, contract2, contract3);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -71,7 +70,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
             SignedAt = DateTimeOffset.Now,
             Type = ContractType.Supply
         };
-        Context.Add(entity);
+        Add(entity);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -110,7 +109,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
             Type = ContractType.Rent,
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -133,7 +132,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
             SignedAt = DateTimeOffset.Now,
             Type = ContractType.Supply
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -171,7 +170,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
             Type = ContractType.Rent,
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -218,7 +217,7 @@ public class ContractRepositoryTests : OfficeProcurementContextInMemory
             SignedAt = DateTimeOffset.Now,
             Type = ContractType.Rent
         };
-        Context.Add(contract);
+        Add(contract);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act

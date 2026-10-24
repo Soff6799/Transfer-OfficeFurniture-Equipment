@@ -1,14 +1,13 @@
 using FluentAssertions;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
-using Xunit;
 
 namespace OfficeProcurement.Repositories.Tests;
 
 /// <summary>
 /// Тесты для <see cref="ClientRepository"/>
 /// </summary>
-public class ClientRepositoryTests : OfficeProcurementContextInMemory
+public class ClientRepositoryTests : BaseRepositoryTests
 {
     private readonly IClientRepository repository;
 
@@ -48,7 +47,7 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
             ContactLastName = "Иванов",
             ContactName = "Иван"
         };
-        Context.Add(entity);
+        Add(entity);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -86,7 +85,7 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
             Inn = "7709999999",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -108,7 +107,7 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
             CompanyName = "ООО Ромашка",
             Inn = "7701234567"
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -145,7 +144,7 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
             Inn = "7708888888",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -166,7 +165,7 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
         var client2 = new Client { CompanyName = "Два", Inn = "7700000002" };
         var client3 = new Client { CompanyName = "Три", Inn = "7700000003" };
 
-        Context.AddRange(client1, client2, client3);
+        AddRange(client1, client2, client3);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -174,8 +173,8 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
 
         // Assert
         result.Should().HaveCount(3);
-        result[0].CompanyName.Should().Be("Раз");
-        result[1].CompanyName.Should().Be("Два");
+        result[0].CompanyName.Should().Be("Два");
+        result[1].CompanyName.Should().Be("Раз");
         result[2].CompanyName.Should().Be("Три");
     }
 
@@ -202,5 +201,33 @@ public class ClientRepositoryTests : OfficeProcurementContextInMemory
         var saved = await repository.GetClientByInnAsync("7709999999", CancellationToken.None);
         saved.Should().NotBeNull();
         saved!.CompanyName.Should().Be("ООО Новый");
+    }
+
+    /// <summary>
+    /// Обновление клиента изменяет его данные
+    /// </summary>
+    [Fact]
+    public async Task UpdateShouldChangeClientData()
+    {
+        // Arrange
+        var client = new Client
+        {
+            CompanyName = "ООО Старое",
+            Inn = "7706666666",
+            ContactLastName = "Иванов",
+            ContactName = "Иван"
+        };
+        Add(client);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act
+        client.CompanyName = "ООО Новое";
+        repository.Update(client);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Assert
+        var updated = await repository.GetClientByIdAsync(client.Id, CancellationToken.None);
+        updated.Should().NotBeNull();
+        updated!.CompanyName.Should().Be("ООО Новое");
     }
 }

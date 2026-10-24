@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccessLayer\OfficeProcurement.Context\OfficeProcurement.Context.csproj" />
+    <ProjectReference Include="..\OfficeProcurement.Context.Tests\OfficeProcurement.Context.Tests.csproj" />
     <ProjectReference Include="..\OfficeProcurement.Entities\OfficeProcurement.Entities.csproj" />
     <ProjectReference Include="..\OfficeProcurement.Repositories\OfficeProcurement.Repositories.csproj" />
   </ItemGroup>

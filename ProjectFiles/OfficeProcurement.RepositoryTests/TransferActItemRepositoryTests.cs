@@ -8,7 +8,7 @@ namespace OfficeProcurement.Repositories.Tests;
 /// <summary>
 /// Тесты для <see cref="TransferActItemRepository"/>
 /// </summary>
-public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
+public class TransferActItemRepositoryTests : BaseRepositoryTests
 {
     private readonly ITransferActItemRepository repository;
 
@@ -44,7 +44,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
         var item2 = new TransferActItem { Name = "Стол", Unit = "шт" };
         var item3 = new TransferActItem { Name = "Шкаф", Unit = "шт" };
 
-        Context.AddRange(item1, item2, item3);
+        AddRange(item1, item2, item3);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -73,7 +73,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
             Quantity = 5,
             UnitPrice = 15000
         };
-        Context.Add(entity);
+        Add(entity);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -111,7 +111,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -134,7 +134,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
             StockNumber = "ST-100",
             Unit = "шт"
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -172,7 +172,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -193,7 +193,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
         var item1 = new TransferActItem { Name = "Стол", Unit = "шт", TransferActId = actId };
         var item2 = new TransferActItem { Name = "Стул", Unit = "шт", TransferActId = actId };
 
-        Context.AddRange(item1, item2);
+        AddRange(item1, item2);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -257,7 +257,7 @@ public class TransferActItemRepositoryTests : OfficeProcurementContextInMemory
             Quantity = 1,
             UnitPrice = 1000
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act

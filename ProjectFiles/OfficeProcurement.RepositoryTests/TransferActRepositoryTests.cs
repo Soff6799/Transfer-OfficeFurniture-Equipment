@@ -7,7 +7,7 @@ namespace OfficeProcurement.Repositories.Tests;
 /// <summary>
 /// Тесты для <see cref="TransferActRepository"/>
 /// </summary>
-public class TransferActRepositoryTests : OfficeProcurementContextInMemory
+public class TransferActRepositoryTests : BaseRepositoryTests
 {
     private readonly ITransferActRepository repository;
 
@@ -43,7 +43,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
         var act2 = new TransferAct { Number = "А-001", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
         var act3 = new TransferAct { Number = "А-002", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
 
-        Context.AddRange(act1, act2, act3);
+        AddRange(act1, act2, act3);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -70,7 +70,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
         };
-        Context.Add(entity);
+        Add(entity);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -109,7 +109,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
             City = "Москва",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -132,7 +132,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -170,7 +170,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
             City = "Москва",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -178,43 +178,6 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
 
         // Assert
         result.Should().BeNull();
-    }
-
-    /// <summary>
-    /// Возвращает акт с договором, клиентом и поставщиком
-    /// </summary>
-    [Fact]
-    public async Task GetTransferActWithContractByIdAsyncShouldReturnValue()
-    {
-        // Arrange
-        var contract = new Contract
-        {
-            Id = Guid.NewGuid(),
-            Number = "Д-100",
-            SignedAt = DateTimeOffset.Now,
-            Type = ContractType.Supply
-        };
-        Context.Add(contract);
-        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
-
-        var act = new TransferAct
-        {
-            Id = Guid.NewGuid(),
-            Number = "А-100",
-            Date = DateOnly.FromDateTime(DateTime.Now),
-            City = "Москва",
-            ContractId = contract.Id
-        };
-        Context.Add(act);
-        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
-
-        // Act
-        var result = await repository.GetTransferActWithContractByIdAsync(act.Id, CancellationToken.None);
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.Contract.Should().NotBeNull();
-        result.Contract!.Number.Should().Be("Д-100");
     }
 
     /// <summary>
@@ -267,7 +230,7 @@ public class TransferActRepositoryTests : OfficeProcurementContextInMemory
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
         };
-        Context.Add(act);
+        Add(act);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act

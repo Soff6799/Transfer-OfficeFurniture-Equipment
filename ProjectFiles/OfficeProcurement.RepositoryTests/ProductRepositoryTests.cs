@@ -8,7 +8,7 @@ namespace OfficeProcurement.Repositories.Tests;
 /// <summary>
 /// Тесты для <see cref="ProductRepository"/>
 /// </summary>
-public class ProductRepositoryTests : OfficeProcurementContextInMemory
+public class ProductRepositoryTests : BaseRepositoryTests
 {
     private readonly IProductRepository repository;
 
@@ -44,7 +44,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
         var product2 = new Product { Name = "Стол", Unit = "шт" };
         var product3 = new Product { Name = "Шкаф", Unit = "шт" };
 
-        Context.AddRange(product1, product2, product3);
+        AddRange(product1, product2, product3);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -72,7 +72,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             Price = 15000
         };
-        Context.Add(entity);
+        Add(entity);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -110,7 +110,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -133,7 +133,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
             StockNumber = "ST-100",
             Unit = "шт"
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -171,7 +171,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             DeletedAt = DateTimeOffset.Now
         };
-        Context.Add(item);
+        Add(item);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -220,7 +220,7 @@ public class ProductRepositoryTests : OfficeProcurementContextInMemory
             Unit = "шт",
             Price = 1000
         };
-        Context.Add(product);
+        Add(product);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Act
