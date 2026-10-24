@@ -15,11 +15,19 @@ public class ServiceProfile : Profile
         CreateMap<Client, ClientModel>().ReverseMap();
         CreateMap<ClientCreateModel, Client>();
 
-        CreateMap<Contract, ContractModel>().ReverseMap();
-        CreateMap<ContractCreateModel, Contract>();
+        CreateMap<Contract, ContractModel>()
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.SignedAt.Date));
+        CreateMap<ContractModel, Contract>()
+            .ForMember(dest => dest.SignedAt, opt => opt.MapFrom(src => new DateTimeOffset(src.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero)));
+        CreateMap<ContractCreateModel, Contract>()
+            .ForMember(dest => dest.SignedAt, opt => opt.MapFrom(src => new DateTimeOffset(src.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero)));
 
-        CreateMap<Product, ProductModel>().ReverseMap();
-        CreateMap<ProductCreateModel, Product>();
+        CreateMap<Product, ProductModel>()
+    .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Price));
+        CreateMap<ProductCreateModel, Product>()
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.UnitPrice));
+        CreateMap<ProductModel, Product>()
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.UnitPrice));
 
         CreateMap<Supplier, SupplierModel>().ReverseMap();
         CreateMap<SupplierCreateModel, Supplier>();
