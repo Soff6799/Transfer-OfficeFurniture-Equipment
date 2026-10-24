@@ -42,6 +42,7 @@ namespace OfficeProcurement.Repositories
         /// <inheritdoc/>
         public Task<Client?> GetClientByInnAsync(string inn, CancellationToken cancellationToken)
             => reader.Read<Client>()
+            .NotDeletedAt()
             .FirstOrDefaultAsync(x => x.Inn == inn, cancellationToken);
     }
 }

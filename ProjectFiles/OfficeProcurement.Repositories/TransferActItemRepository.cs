@@ -41,6 +41,7 @@ namespace OfficeProcurement.Repositories
         /// <inheritdoc/>
         public Task<TransferActItem?> GetTransferActItemByStockNumberAsync(string stockNumber, CancellationToken cancellationToken)
             => reader.Read<TransferActItem>()
+                .NotDeletedAt()
                 .FirstOrDefaultAsync(x => x.StockNumber == stockNumber, cancellationToken);
 
         /// <inheritdoc/>

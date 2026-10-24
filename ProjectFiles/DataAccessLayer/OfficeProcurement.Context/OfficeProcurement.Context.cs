@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using OfficeProcurement.Entities.Configurations;
 using OfficeProcurement.Dal.Contracts.Repositories;
+using OfficeProcurement.Entities.Configurations;
+using OfficeProcurement.Infrastructure.Common;
+using OfficeProcurement.Infrastructure.Providers;
 
 namespace OfficeProcurement.Context;
 
@@ -10,7 +12,8 @@ namespace OfficeProcurement.Context;
 public class OfficeProcurementContext : DbContext,
     IReader,
     IWriter,
-    IUnitOfWork
+    IUnitOfWork,
+    IDbWriterContext
 {
     /// <summary>
     /// Инициирует новый экземпляр <see cref="OfficeProcurementContext"/>
@@ -53,5 +56,13 @@ public class OfficeProcurementContext : DbContext,
         return count;
 
     }
+
+    public IWriter Writer => this;
+
+    /// <inheritdoc/>
+    public IDateTimeProvider DateTimeProvider { get; } = new DateTimeProvider();
+
+    /// <inheritdoc/>
+    public IIdentityProvider IdentityProvider { get; } = new IdentityProvider();
 }
 
