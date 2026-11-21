@@ -16,7 +16,7 @@ public class ServiceProfile : Profile
         CreateMap<ClientCreateModel, Client>();
 
         CreateMap<Contract, ContractModel>()
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.SignedAt.Date));
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.SignedAt.DateTime)));
         CreateMap<ContractModel, Contract>()
             .ForMember(dest => dest.SignedAt, opt => opt.MapFrom(src => new DateTimeOffset(src.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero)));
         CreateMap<ContractCreateModel, Contract>()

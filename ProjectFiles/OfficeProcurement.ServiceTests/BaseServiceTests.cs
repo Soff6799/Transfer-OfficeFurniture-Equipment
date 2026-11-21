@@ -24,7 +24,9 @@ public abstract class BaseServiceTests : IDisposable
         WriterContext = Context;
         UnitOfWork = Context;
         var profile = new ServiceProfile();
-        Mapper = new MapperConfiguration(x => x.AddProfile(profile)).CreateMapper();
+        var configuration = new MapperConfiguration(x => x.AddProfile(profile));
+        configuration.AssertConfigurationIsValid();
+        Mapper = configuration.CreateMapper();
     }
 
     /// <summary>
