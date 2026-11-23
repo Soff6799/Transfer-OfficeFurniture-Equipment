@@ -2,6 +2,7 @@ using AutoMapper;
 using OfficeProcurement.Context.Tests;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Services.Automapper;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace OfficeProcurement.ServiceTests;
 
@@ -24,7 +25,7 @@ public abstract class BaseServiceTests : IDisposable
         WriterContext = Context;
         UnitOfWork = Context;
         var profile = new ServiceProfile();
-        var configuration = new MapperConfiguration(x => x.AddProfile(profile));
+        var configuration = new MapperConfiguration(x => x.AddProfile(profile), NullLoggerFactory.Instance);
         configuration.AssertConfigurationIsValid();
         Mapper = configuration.CreateMapper();
     }

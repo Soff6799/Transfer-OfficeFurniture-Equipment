@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OfficeProcurement.Automapper;
 using OfficeProcurement.Common;
 using OfficeProcurement.Context;
