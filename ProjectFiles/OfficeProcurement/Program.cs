@@ -20,7 +20,7 @@ using OfficeProcurement.Services.Contracts.Models;
 using OfficeProcurement.Services.Implementations;
 using OfficeProcurement.Services.Validators.Client;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
