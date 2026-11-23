@@ -22,6 +22,7 @@ using OfficeProcurement.Services.Validators.Client;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
+builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 builder.Services.AddSingleton<IIdentityProvider, IdentityProvider>();
 
