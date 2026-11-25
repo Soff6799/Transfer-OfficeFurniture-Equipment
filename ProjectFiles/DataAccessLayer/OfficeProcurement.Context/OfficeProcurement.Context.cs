@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OfficeProcurement.Dal.Contracts.Repositories;
+using OfficeProcurement.Entities;
 using OfficeProcurement.Entities.Configurations;
+using OfficeProcurement.Entities.Enums;
 using OfficeProcurement.Infrastructure.Common;
 using OfficeProcurement.Infrastructure.Providers;
 
@@ -30,6 +32,31 @@ public class OfficeProcurementContext : DbContext,
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IEntitiesAnchor).Assembly);
+
+        // Сидинг тестовых пользователей
+        var adminUser = new User
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            Login = "admin",
+            PasswordHash = HashPassword("admin123"),
+            Role = UserRole.Admin,
+            FullName = "Манжосова София Александровна",
+            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedBy = "System"
+        };
+
+        var managerUser = new User
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+            Login = "manager",
+            PasswordHash = HashPassword("manager123"),
+            Role = UserRole.Manager,
+            FullName = "Иванов Иван Иванович",
+            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedBy = "System"
+        };
+
+        modelBuilder.Entity<User>().HasData(adminUser, managerUser);
     }
 
     IQueryable<TEntity> IReader.Read<TEntity>()
@@ -64,5 +91,15 @@ public class OfficeProcurementContext : DbContext,
 
     /// <inheritdoc/>
     public IIdentityProvider IdentityProvider { get; } = new IdentityProvider();
+
+    /// <summary>
+    /// Вычисляет SHA256-хеш пароля. Используется только для сидинга тестовых данных
+    /// </summary>
+    private static string HashPassword(string password)
+    {
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        return Convert.ToBase64String(bytes);
+    }
 }
 
