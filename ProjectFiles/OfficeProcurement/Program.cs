@@ -57,6 +57,7 @@ builder.Services.AddScoped<ITransferActItemService, TransferActItemService>();
 builder.Services.AddScoped<ITransferActService, TransferActService>();
 
 builder.Services.AddScoped<ITransferActExcelService, TransferActExcelService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(ClientCreateModelValidator).Assembly);
 builder.Services.AddScoped<IValidateService, ValidateService>();
