@@ -317,4 +317,43 @@ public class TransferActServiceTests : BaseServiceTests
         await act.Should().ThrowAsync<EntityNotFoundException<Contract>>();
     }
 
+    /// <summary>
+    /// При удалении акта передачи его позиции также помечаются как удалённые (мягкий каскад)
+    /// </summary>
+    [Fact]
+    public async Task DeleteTransferActShouldSoftDeleteItsItems()
+    {
+        // Arrange
+        var transferAct = new TransferAct
+        {
+            Id = Guid.NewGuid(),
+            Number = "А-CASCADE",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва"
+        };
+        var item = new TransferActItem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Кресло офисное",
+            Unit = "шт",
+            Quantity = 2,
+            UnitPrice = 5000,
+            TransferActId = transferAct.Id
+        };
+        Add(transferAct);
+        Add(item);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act
+        await transferActService.DeleteTransferAct(transferAct.Id, CancellationToken.None);
+
+        // Assert
+        var deletedAct = Context.Set<TransferAct>().First(x => x.Id == transferAct.Id);
+        var deletedItem = Context.Set<TransferActItem>().First(x => x.Id == item.Id);
+
+        deletedAct.DeletedAt.Should().NotBeNull();
+        deletedItem.DeletedAt.Should().NotBeNull();
+    }
+
+
 }
