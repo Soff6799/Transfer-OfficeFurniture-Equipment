@@ -109,13 +109,13 @@ public class SupplierService : ISupplierService
         var hasContracts = await contractRepository.HasContractsBySupplierIdAsync(id, cancellationToken);
         if (hasContracts)
         {
-            throw new OfficeProcurementInvalidOperationException("Нельзя удалить поставщика: существуют связанные договоры");
+            throw new OfficeProcurementConflictException("Нельзя удалить поставщика: существуют связанные договоры");
         }
 
         var hasProducts = await productRepository.HasProductsBySupplierIdAsync(id, cancellationToken);
         if (hasProducts)
         {
-            throw new OfficeProcurementInvalidOperationException("Нельзя удалить поставщика: существуют связанные товары");
+            throw new OfficeProcurementConflictException("Нельзя удалить поставщика: существуют связанные товары");
         }
 
         supplierRepository.Delete(entity);

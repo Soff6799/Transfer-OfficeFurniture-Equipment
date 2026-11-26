@@ -377,7 +377,7 @@ public class ProductServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => productService.DeleteProduct(product.Id, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
 

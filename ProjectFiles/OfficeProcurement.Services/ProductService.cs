@@ -124,7 +124,7 @@ public class ProductService : IProductService
         var hasItems = await transferActItemRepository.HasItemsByProductIdAsync(id, cancellationToken);
         if (hasItems)
         {
-            throw new OfficeProcurementInvalidOperationException("Нельзя удалить продукт: он используется в актах передачи");
+            throw new OfficeProcurementConflictException("Нельзя удалить продукт: он используется в актах передачи");
         }
 
         productRepository.Delete(entity);

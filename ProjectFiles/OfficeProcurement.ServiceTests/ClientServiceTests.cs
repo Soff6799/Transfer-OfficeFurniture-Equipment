@@ -16,7 +16,6 @@ public class ClientServiceTests : BaseServiceTests
 {
     private readonly IClientService clientService;
     private readonly IClientRepository clientRepository;
-    private IContractRepository contractRepository;
 
     /// <summary>
     /// Инициализирует тесты сервиса клиентов
@@ -24,6 +23,7 @@ public class ClientServiceTests : BaseServiceTests
     public ClientServiceTests()
     {
         clientRepository = new ClientRepository(WriterContext, Context);
+        var contractRepository = new ContractRepository(WriterContext, Context);
         clientService = new ClientService(clientRepository, contractRepository, UnitOfWork, Mapper);
     }
 
@@ -253,7 +253,7 @@ public class ClientServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => clientService.DeleteClient(client.Id, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
 }

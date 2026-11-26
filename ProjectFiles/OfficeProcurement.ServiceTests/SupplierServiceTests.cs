@@ -290,7 +290,7 @@ public class SupplierServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => supplierService.DeleteSupplier(supplier.Id, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
 }

@@ -103,7 +103,7 @@ public class ClientService : IClientService
         var hasContracts = await contractRepository.HasContractsByClientIdAsync(id, cancellationToken);
         if (hasContracts)
         {
-            throw new OfficeProcurementInvalidOperationException("Нельзя удалить клиента: существуют связанные договоры");
+            throw new OfficeProcurementConflictException("Нельзя удалить клиента: существуют связанные договоры");
         }
 
         clientRepository.Delete(entity);

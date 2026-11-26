@@ -372,7 +372,7 @@ public class ContractServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => contractService.DeleteContract(contract.Id, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
 }

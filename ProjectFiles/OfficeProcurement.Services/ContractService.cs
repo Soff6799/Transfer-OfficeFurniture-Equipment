@@ -133,7 +133,7 @@ public class ContractService : IContractService
         var hasTransferActs = await transferActRepository.HasTransferActsByContractIdAsync(id, cancellationToken);
         if (hasTransferActs)
         {
-            throw new OfficeProcurementInvalidOperationException("Нельзя удалить договор: существуют связанные акты передачи");
+            throw new OfficeProcurementConflictException("Нельзя удалить договор: существуют связанные акты передачи");
         }
 
         contractRepository.Delete(entity);
