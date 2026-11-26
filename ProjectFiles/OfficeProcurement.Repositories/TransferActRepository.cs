@@ -48,11 +48,15 @@ namespace OfficeProcurement.Repositories
         public async Task<TransferAct?> GetTransferActWithContractByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await reader.Read<TransferAct>()
+                .NotDeletedAt()
                 .Include(x => x.Contract)
                     .ThenInclude(c => c.Client)
                 .Include(x => x.Contract)
                     .ThenInclude(c => c.Supplier)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
+
+        public Task<bool> HasTransferActsByContractIdAsync(Guid contractId, CancellationToken cancellationToken)
+            => reader.Read<TransferAct>().NotDeletedAt().AnyAsync(x => x.ContractId == contractId, cancellationToken);
     }
 }

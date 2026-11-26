@@ -38,5 +38,7 @@ namespace OfficeProcurement.Repositories.Contracts
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Коллекция позиций акта</returns>
         Task<IReadOnlyCollection<TransferActItem>> GetTransferActItemsByTransferActIdAsync(Guid transferActId, CancellationToken cancellationToken);
+
+        Task<bool> HasItemsByProductIdAsync(Guid productId, CancellationToken cancellationToken);
     }
 }

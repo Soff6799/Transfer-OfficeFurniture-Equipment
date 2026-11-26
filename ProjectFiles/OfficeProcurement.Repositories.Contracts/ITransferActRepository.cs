@@ -35,5 +35,7 @@ namespace OfficeProcurement.Repositories.Contracts
         /// Получает акт передачи с договором по идентификатору
         /// </summary>
         Task<TransferAct?> GetTransferActWithContractByIdAsync(Guid id, CancellationToken cancellationToken);
+
+        Task<bool> HasTransferActsByContractIdAsync(Guid contractId, CancellationToken cancellationToken);
     }
 }

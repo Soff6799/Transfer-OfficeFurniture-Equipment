@@ -23,7 +23,8 @@ public class ClientServiceTests : BaseServiceTests
     public ClientServiceTests()
     {
         clientRepository = new ClientRepository(WriterContext, Context);
-        clientService = new ClientService(clientRepository, UnitOfWork, Mapper);
+        var contractRepository = new ContractRepository(WriterContext, Context);
+        clientService = new ClientService(clientRepository, contractRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -229,4 +230,30 @@ public class ClientServiceTests : BaseServiceTests
         var act = () => clientService.DeleteClient(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Client>>();
     }
+
+    /// <summary>
+    /// Если у клиента есть связанные договоры, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteClientShouldThrowExceptionIfContractsExist()
+    {
+        // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var contract = new Contract
+        {
+            Id = Guid.NewGuid(),
+            Number = "Д-001",
+            SignedAt = DateTimeOffset.Now,
+            Type = ContractType.Supply,
+            ClientId = client.Id
+        };
+        Add(client);
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => clientService.DeleteClient(client.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
+    }
+
 }

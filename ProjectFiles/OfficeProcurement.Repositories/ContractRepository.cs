@@ -44,5 +44,11 @@ namespace OfficeProcurement.Repositories
                 .NotDeletedAt()
                 .Where(x => x.Number == number)
                 .FirstOrDefaultAsync(cancellationToken);
+
+        public Task<bool> HasContractsByClientIdAsync(Guid clientId, CancellationToken cancellationToken)
+            => reader.Read<Contract>().NotDeletedAt().AnyAsync(c => c.ClientId == clientId, cancellationToken);
+
+        public Task<bool> HasContractsBySupplierIdAsync(Guid supplierId, CancellationToken cancellationToken)
+            => reader.Read<Contract>().NotDeletedAt().AnyAsync(c => c.SupplierId == supplierId, cancellationToken);
     }
 }

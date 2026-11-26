@@ -41,6 +41,12 @@ public class ExceptionFilter : IExceptionFilter
                     },
                     context);
                 break;
+            case OfficeProcurementConflictException ex:
+                SetDataToContext(new ConflictObjectResult(new ApiExceptionDetail
+                {
+                    Message = ex.Message,
+                }), context);
+                break;
             default:
                 SetDataToContext(new BadRequestObjectResult(new ApiExceptionDetail
                 {

@@ -23,7 +23,9 @@ public class SupplierServiceTests : BaseServiceTests
     public SupplierServiceTests()
     {
         supplierRepository = new SupplierRepository(WriterContext, Context);
-        supplierService = new SupplierService(supplierRepository, UnitOfWork, Mapper);
+        var contractRepository = new ContractRepository(WriterContext, Context);
+        var productRepository = new ProductRepository(WriterContext, Context);
+        supplierService = new SupplierService(supplierRepository, contractRepository, productRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -265,4 +267,30 @@ public class SupplierServiceTests : BaseServiceTests
         var act = () => supplierService.DeleteSupplier(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Supplier>>();
     }
+
+    /// <summary>
+    /// Если у поставщика есть связанные договоры, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteSupplierShouldThrowExceptionIfContractsExist()
+    {
+        // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        var contract = new Contract
+        {
+            Id = Guid.NewGuid(),
+            Number = "Д-001",
+            SignedAt = DateTimeOffset.Now,
+            Type = ContractType.Supply,
+            SupplierId = supplier.Id
+        };
+        Add(supplier);
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => supplierService.DeleteSupplier(supplier.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
+    }
+
 }

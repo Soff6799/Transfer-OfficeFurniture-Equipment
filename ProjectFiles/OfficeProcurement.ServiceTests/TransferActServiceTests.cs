@@ -23,7 +23,9 @@ public class TransferActServiceTests : BaseServiceTests
     public TransferActServiceTests()
     {
         transferActRepository = new TransferActRepository(WriterContext, Context);
-        transferActService = new TransferActService(transferActRepository, UnitOfWork, Mapper);
+        var transferActItemRepository = new TransferActItemRepository(WriterContext, Context);
+        var contractRepository = new ContractRepository(WriterContext, Context);
+        transferActService = new TransferActService(transferActRepository, transferActItemRepository, contractRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -102,8 +104,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task CreateTransferActShouldSaveToDatabase()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActCreateModel
         {
+            ContractId = contract.Id,
             Number = "А-NEW",
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
@@ -128,12 +134,16 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task CreateTransferActShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var existing = new TransferAct { Number = "А-100", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         var model = new TransferActCreateModel
         {
+            ContractId = contract.Id,
             Number = "А-100",
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
@@ -151,8 +161,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldChangeData()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-OLD",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -163,6 +177,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = entity.Id,
             Number = "А-UPDATED",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -186,8 +201,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-NOTEXIST",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -206,8 +225,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity1 = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-001",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -215,6 +238,7 @@ public class TransferActServiceTests : BaseServiceTests
         };
         var entity2 = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-002",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -225,6 +249,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = entity1.Id,
             Number = "А-002",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -271,4 +296,64 @@ public class TransferActServiceTests : BaseServiceTests
         var act = () => transferActService.DeleteTransferAct(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<TransferAct>>();
     }
+
+    /// <summary>
+    /// Если договор не найден при создании акта, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateTransferActShouldThrowExceptionIfContractNotFound()
+    {
+        // Arrange
+        var model = new TransferActCreateModel
+        {
+            Number = "А-ERR",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва",
+            ContractId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        var act = () => transferActService.CreateTransferAct(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Contract>>();
+    }
+
+    /// <summary>
+    /// При удалении акта передачи его позиции также помечаются как удалённые (мягкий каскад)
+    /// </summary>
+    [Fact]
+    public async Task DeleteTransferActShouldSoftDeleteItsItems()
+    {
+        // Arrange
+        var transferAct = new TransferAct
+        {
+            Id = Guid.NewGuid(),
+            Number = "А-CASCADE",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва"
+        };
+        var item = new TransferActItem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Кресло офисное",
+            Unit = "шт",
+            Quantity = 2,
+            UnitPrice = 5000,
+            TransferActId = transferAct.Id
+        };
+        Add(transferAct);
+        Add(item);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act
+        await transferActService.DeleteTransferAct(transferAct.Id, CancellationToken.None);
+
+        // Assert
+        var deletedAct = Context.Set<TransferAct>().First(x => x.Id == transferAct.Id);
+        var deletedItem = Context.Set<TransferActItem>().First(x => x.Id == item.Id);
+
+        deletedAct.DeletedAt.Should().NotBeNull();
+        deletedItem.DeletedAt.Should().NotBeNull();
+    }
+
+
 }

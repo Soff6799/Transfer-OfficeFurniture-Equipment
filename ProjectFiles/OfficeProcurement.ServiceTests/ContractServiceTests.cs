@@ -23,7 +23,10 @@ public class ContractServiceTests : BaseServiceTests
     public ContractServiceTests()
     {
         contractRepository = new ContractRepository(WriterContext, Context);
-        contractService = new ContractService(contractRepository, UnitOfWork, Mapper);
+        var clientRepository = new ClientRepository(WriterContext, Context);
+        var supplierRepository = new SupplierRepository(WriterContext, Context);
+        var transferActRepository = new TransferActRepository(WriterContext, Context);
+        contractService = new ContractService(contractRepository, UnitOfWork, Mapper, clientRepository, supplierRepository, transferActRepository);
     }
 
     /// <summary>
@@ -102,11 +105,18 @@ public class ContractServiceTests : BaseServiceTests
     public async Task CreateContractShouldSaveToDatabase()
     {
         // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(client);
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new ContractCreateModel
         {
             Number = "Д-NEW",
             Date = DateOnly.FromDateTime(DateTime.Now),
-            Type = ContractType.Supply
+            Type = ContractType.Supply,
+            ClientId = client.Id,
+            SupplierId = supplier.Id
         };
 
         // Act
@@ -127,6 +137,12 @@ public class ContractServiceTests : BaseServiceTests
     public async Task CreateContractShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(client);
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var existing = new Contract { Number = "Д-100", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
@@ -135,7 +151,9 @@ public class ContractServiceTests : BaseServiceTests
         {
             Number = "Д-100",
             Date = DateOnly.FromDateTime(DateTime.Now),
-            Type = ContractType.Rent
+            Type = ContractType.Rent,
+            ClientId = client.Id,
+            SupplierId = supplier.Id
         };
 
         // Act & Assert
@@ -150,8 +168,16 @@ public class ContractServiceTests : BaseServiceTests
     public async Task UpdateContractShouldChangeData()
     {
         // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(client);
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var entity = new Contract
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Number = "Д-OLD",
             SignedAt = DateTimeOffset.Now,
@@ -162,6 +188,8 @@ public class ContractServiceTests : BaseServiceTests
 
         var model = new ContractModel
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = entity.Id,
             Number = "Д-UPDATED",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -185,8 +213,16 @@ public class ContractServiceTests : BaseServiceTests
     public async Task UpdateContractShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(client);
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var model = new ContractModel
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Number = "Д-NOTEXIST",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -205,8 +241,16 @@ public class ContractServiceTests : BaseServiceTests
     public async Task UpdateContractShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var client = new Client { Id = Guid.NewGuid(), Inn = "1234567890" };
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(client);
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var entity1 = new Contract
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Number = "Д-001",
             SignedAt = DateTimeOffset.Now,
@@ -214,6 +258,8 @@ public class ContractServiceTests : BaseServiceTests
         };
         var entity2 = new Contract
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Number = "Д-002",
             SignedAt = DateTimeOffset.Now,
@@ -224,6 +270,8 @@ public class ContractServiceTests : BaseServiceTests
 
         var model = new ContractModel
         {
+            ClientId = client.Id,
+            SupplierId = supplier.Id,
             Id = entity1.Id,
             Number = "Д-002",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -270,4 +318,61 @@ public class ContractServiceTests : BaseServiceTests
         var act = () => contractService.DeleteContract(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Contract>>();
     }
+
+    /// <summary>
+    /// Если клиент не найден при создании договора, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateContractShouldThrowExceptionIfClientNotFound()
+    {
+        // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        var model = new ContractCreateModel
+        {
+            Number = "Д-ERR",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            Type = ContractType.Supply,
+            ClientId = Guid.NewGuid(),
+            SupplierId = supplier.Id
+        };
+
+        // Act & Assert
+        var act = () => contractService.CreateContract(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Client>>();
+    }
+
+    /// <summary>
+    /// Если у договора есть связанные акты передачи, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteContractShouldThrowExceptionIfTransferActsExist()
+    {
+        // Arrange
+        var contract = new Contract
+        {
+            Id = Guid.NewGuid(),
+            Number = "Д-001",
+            SignedAt = DateTimeOffset.Now,
+            Type = ContractType.Supply
+        };
+        var transferAct = new TransferAct
+        {
+            Id = Guid.NewGuid(),
+            Number = "А-001",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва",
+            ContractId = contract.Id
+        };
+        Add(contract);
+        Add(transferAct);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => contractService.DeleteContract(contract.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
+    }
+
 }

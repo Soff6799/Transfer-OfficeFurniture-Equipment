@@ -14,17 +14,26 @@ namespace OfficeProcurement.Services;
 public class ContractService : IContractService
 {
     private readonly IContractRepository contractRepository;
+    private readonly IClientRepository clientRepository;
+    private readonly ISupplierRepository supplierRepository;
+    private readonly ITransferActRepository transferActRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса договоров
     /// </summary>
-    public ContractService(IContractRepository contractRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public ContractService(IContractRepository contractRepository, IUnitOfWork unitOfWork, IMapper mapper,
+        IClientRepository clientRepository,
+        ISupplierRepository supplierRepository,
+        ITransferActRepository transferActRepository)
     {
         this.contractRepository = contractRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
+        this.clientRepository = clientRepository;
+        this.supplierRepository = supplierRepository;
+        this.transferActRepository = transferActRepository;
     }
 
     /// <summary>
@@ -54,6 +63,18 @@ public class ContractService : IContractService
     /// </summary>
     async Task<ContractModel> IContractService.CreateContract(ContractCreateModel contractCreateModel, CancellationToken cancellationToken)
     {
+        var client = await clientRepository.GetClientByIdAsync(contractCreateModel.ClientId, cancellationToken);
+        if (client is null)
+        {
+            throw new EntityNotFoundException<Client>(contractCreateModel.ClientId);
+        }
+
+        var supplier = await supplierRepository.GetSupplierByIdAsync(contractCreateModel.SupplierId, cancellationToken);
+        if (supplier is null)
+        {
+            throw new EntityNotFoundException<Supplier>(contractCreateModel.SupplierId);
+        }
+
         var existing = await contractRepository.GetContractByNumberAsync(contractCreateModel.Number, cancellationToken);
         if (existing is not null)
         {
@@ -71,6 +92,18 @@ public class ContractService : IContractService
     /// </summary>
     async Task IContractService.UpdateContract(ContractModel contractModel, CancellationToken cancellationToken)
     {
+        var client = await clientRepository.GetClientByIdAsync(contractModel.ClientId, cancellationToken);
+        if (client is null)
+        {
+            throw new EntityNotFoundException<Client>(contractModel.ClientId);
+        }
+
+        var supplier = await supplierRepository.GetSupplierByIdAsync(contractModel.SupplierId, cancellationToken);
+        if (supplier is null)
+        {
+            throw new EntityNotFoundException<Supplier>(contractModel.SupplierId);
+        }
+
         var existing = await contractRepository.GetContractByNumberAsync(contractModel.Number, cancellationToken);
         if (existing is not null && existing.Id != contractModel.Id)
         {
@@ -96,6 +129,13 @@ public class ContractService : IContractService
         {
             throw new EntityNotFoundException<Contract>(id);
         }
+
+        var hasTransferActs = await transferActRepository.HasTransferActsByContractIdAsync(id, cancellationToken);
+        if (hasTransferActs)
+        {
+            throw new OfficeProcurementConflictException("Нельзя удалить договор: существуют связанные акты передачи");
+        }
+
         contractRepository.Delete(entity);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

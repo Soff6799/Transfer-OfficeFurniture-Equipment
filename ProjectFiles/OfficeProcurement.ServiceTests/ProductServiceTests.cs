@@ -23,7 +23,9 @@ public class ProductServiceTests : BaseServiceTests
     public ProductServiceTests()
     {
         productRepository = new ProductRepository(WriterContext, Context);
-        productService = new ProductService(productRepository, UnitOfWork, Mapper);
+        var supplierRepository = new SupplierRepository(WriterContext, Context);
+        var transferActItemRepository = new TransferActItemRepository(WriterContext, Context);
+        productService = new ProductService(productRepository, supplierRepository, transferActItemRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -103,8 +105,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductShouldSaveToDatabase()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Новый продукт",
             StockNumber = "ST-NEW",
             Unit = "шт",
@@ -131,8 +137,13 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductWithoutStockNumberShouldSucceed()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Продукт без номера",
             StockNumber = null,  // Нет складского номера
             Unit = "шт",
@@ -154,12 +165,17 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var existing = new Product { Name = "Старый", StockNumber = "ST-100", Unit = "шт" };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Новый",
             StockNumber = "ST-100",  // Тот же номер
             Unit = "шт",
@@ -178,8 +194,13 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldChangeData()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var entity = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Старое название",
             StockNumber = "ST-OLD",
@@ -191,6 +212,7 @@ public class ProductServiceTests : BaseServiceTests
 
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = entity.Id,
             Name = "Новое название",
             StockNumber = "ST-OLD",
@@ -215,8 +237,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Несуществующий",
             StockNumber = "ST-NO",
@@ -236,8 +262,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity1 = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Продукт 1",
             StockNumber = "ST-001",
@@ -245,6 +275,7 @@ public class ProductServiceTests : BaseServiceTests
         };
         var entity2 = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Продукт 2",
             StockNumber = "ST-002",
@@ -255,6 +286,7 @@ public class ProductServiceTests : BaseServiceTests
 
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = entity1.Id,
             Name = "Продукт 1 обновлённый",
             StockNumber = "ST-002",  // Номер уже занят entity2
@@ -302,4 +334,51 @@ public class ProductServiceTests : BaseServiceTests
         var act = () => productService.DeleteProduct(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Product>>();
     }
+
+    /// <summary>
+    /// Если поставщик не найден при создании продукта, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateProductShouldThrowExceptionIfSupplierNotFound()
+    {
+        // Arrange
+        var model = new ProductCreateModel
+        {
+            Name = "Новый продукт",
+            StockNumber = "ST-ERR",
+            Unit = "шт",
+            UnitPrice = 5000,
+            SupplierId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        var act = () => productService.CreateProduct(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Supplier>>();
+    }
+
+    /// <summary>
+    /// Если продукт используется в позициях акта, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteProductShouldThrowExceptionIfTransferActItemsExist()
+    {
+        // Arrange
+        var product = new Product { Id = Guid.NewGuid(), Name = "Стол", Unit = "шт" };
+        var item = new TransferActItem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Стол",
+            Unit = "шт",
+            ProductId = product.Id
+        };
+        Add(product);
+        Add(item);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => productService.DeleteProduct(product.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
+    }
+
+
 }

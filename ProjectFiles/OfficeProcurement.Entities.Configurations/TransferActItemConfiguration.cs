@@ -56,7 +56,8 @@ public class TransferActItemConfiguration : IEntityTypeConfiguration<TransferAct
 
         builder.HasIndex(x => x.StockNumber)
             .HasDatabaseName("IX_TransferActItems_StockNumber")
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         builder.HasIndex(x => x.Name)
             .HasDatabaseName("IX_TransferActItems_Name");

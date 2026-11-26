@@ -47,7 +47,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasIndex(x => x.StockNumber)
             .HasDatabaseName("IX_Products_StockNumber")
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         builder.HasIndex(x => x.Name)
             .HasDatabaseName("IX_Products_Name");

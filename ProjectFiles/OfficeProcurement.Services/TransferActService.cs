@@ -14,15 +14,22 @@ namespace OfficeProcurement.Services;
 public class TransferActService : ITransferActService
 {
     private readonly ITransferActRepository transferActRepository;
+    private readonly ITransferActItemRepository transferActItemRepository;
     private readonly IUnitOfWork unitOfWork;
+    private readonly IContractRepository contractRepository;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса актов передачи
     /// </summary>
-    public TransferActService(ITransferActRepository transferActRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public TransferActService(ITransferActRepository transferActRepository,
+        ITransferActItemRepository transferActItemRepository,
+        IContractRepository contractRepository,
+        IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.transferActRepository = transferActRepository;
+        this.transferActItemRepository = transferActItemRepository;
+        this.contractRepository = contractRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
@@ -55,8 +62,13 @@ public class TransferActService : ITransferActService
     /// </summary>
     async Task<TransferActModel> ITransferActService.CreateTransferAct(TransferActCreateModel transferActCreateModel, CancellationToken cancellationToken)
     {
-        var existing = await transferActRepository.GetTransferActByNumberAsync(transferActCreateModel.Number, cancellationToken);
+        var contract = await contractRepository.GetContractByIdAsync(transferActCreateModel.ContractId, cancellationToken);
+        if (contract is null)
+        {
+            throw new EntityNotFoundException<Contract>(transferActCreateModel.ContractId);
+        }
 
+        var existing = await transferActRepository.GetTransferActByNumberAsync(transferActCreateModel.Number, cancellationToken);
         if (existing is not null)
         {
             throw new OfficeProcurementInvalidOperationException($"Акт с номером '{transferActCreateModel.Number}' уже существует");
@@ -74,8 +86,13 @@ public class TransferActService : ITransferActService
     /// </summary>
     async Task ITransferActService.UpdateTransferAct(TransferActModel transferActModel, CancellationToken cancellationToken)
     {
-        var existing = await transferActRepository.GetTransferActByNumberAsync(transferActModel.Number, cancellationToken);
+        var contract = await contractRepository.GetContractByIdAsync(transferActModel.ContractId, cancellationToken);
+        if (contract is null)
+        {
+            throw new EntityNotFoundException<Contract>(transferActModel.ContractId);
+        }
 
+        var existing = await transferActRepository.GetTransferActByNumberAsync(transferActModel.Number, cancellationToken);
         if (existing is not null && existing.Id != transferActModel.Id)
         {
             throw new OfficeProcurementInvalidOperationException($"Акт с номером '{transferActModel.Number}' уже существует");
@@ -101,6 +118,13 @@ public class TransferActService : ITransferActService
         if (entity is null)
         {
             throw new EntityNotFoundException<TransferAct>(id);
+        }
+
+        // Мягкий каскад
+        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(id, cancellationToken);
+        foreach (var item in items)
+        {
+            transferActItemRepository.Delete(item);
         }
 
         transferActRepository.Delete(entity);
