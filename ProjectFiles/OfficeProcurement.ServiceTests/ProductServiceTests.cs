@@ -24,7 +24,8 @@ public class ProductServiceTests : BaseServiceTests
     {
         productRepository = new ProductRepository(WriterContext, Context);
         var supplierRepository = new SupplierRepository(WriterContext, Context);
-        productService = new ProductService(productRepository, supplierRepository, UnitOfWork, Mapper);
+        var transferActItemRepository = new TransferActItemRepository(WriterContext, Context);
+        productService = new ProductService(productRepository, supplierRepository, transferActItemRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>

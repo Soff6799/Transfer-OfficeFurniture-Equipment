@@ -16,6 +16,7 @@ public class ClientServiceTests : BaseServiceTests
 {
     private readonly IClientService clientService;
     private readonly IClientRepository clientRepository;
+    private IContractRepository contractRepository;
 
     /// <summary>
     /// Инициализирует тесты сервиса клиентов
@@ -23,7 +24,7 @@ public class ClientServiceTests : BaseServiceTests
     public ClientServiceTests()
     {
         clientRepository = new ClientRepository(WriterContext, Context);
-        clientService = new ClientService(clientRepository, UnitOfWork, Mapper);
+        clientService = new ClientService(clientRepository, contractRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>

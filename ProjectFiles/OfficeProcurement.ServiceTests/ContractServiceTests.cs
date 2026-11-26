@@ -25,7 +25,8 @@ public class ContractServiceTests : BaseServiceTests
         contractRepository = new ContractRepository(WriterContext, Context);
         var clientRepository = new ClientRepository(WriterContext, Context);
         var supplierRepository = new SupplierRepository(WriterContext, Context);
-        contractService = new ContractService(contractRepository, UnitOfWork, Mapper, clientRepository, supplierRepository);
+        var transferActRepository = new TransferActRepository(WriterContext, Context);
+        contractService = new ContractService(contractRepository, UnitOfWork, Mapper, clientRepository, supplierRepository, transferActRepository);
     }
 
     /// <summary>

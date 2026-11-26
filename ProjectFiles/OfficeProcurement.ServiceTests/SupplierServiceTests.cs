@@ -23,7 +23,9 @@ public class SupplierServiceTests : BaseServiceTests
     public SupplierServiceTests()
     {
         supplierRepository = new SupplierRepository(WriterContext, Context);
-        supplierService = new SupplierService(supplierRepository, UnitOfWork, Mapper);
+        var contractRepository = new ContractRepository(WriterContext, Context);
+        var productRepository = new ProductRepository(WriterContext, Context);
+        supplierService = new SupplierService(supplierRepository, contractRepository, productRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
