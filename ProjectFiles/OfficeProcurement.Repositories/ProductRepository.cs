@@ -43,5 +43,12 @@ namespace OfficeProcurement.Repositories
             => reader.Read<Product>()
                 .NotDeletedAt()
                 .FirstOrDefaultAsync(x => x.StockNumber == stockNumber, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<bool> HasProductsBySupplierIdAsync(Guid supplierId, CancellationToken cancellationToken)
+            => reader.Read<Product>()
+                .NotDeletedAt()
+                .AnyAsync(x => x.SupplierId == supplierId, cancellationToken);
+
     }
 }

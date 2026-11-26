@@ -55,5 +55,8 @@ namespace OfficeProcurement.Repositories
                     .ThenInclude(c => c.Supplier)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
+
+        public Task<bool> HasTransferActsByContractIdAsync(Guid contractId, CancellationToken cancellationToken)
+            => reader.Read<TransferAct>().NotDeletedAt().AnyAsync(x => x.ContractId == contractId, cancellationToken);
     }
 }

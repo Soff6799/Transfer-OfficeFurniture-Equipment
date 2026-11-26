@@ -30,5 +30,7 @@ namespace OfficeProcurement.Repositories.Contracts
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Сущность продукта или <c>null</c>, если не найдена</returns>
         Task<Product?> GetProductByStockNumberAsync(string stockNumber, CancellationToken cancellationToken);
+
+        Task<bool> HasProductsBySupplierIdAsync(Guid supplierId, CancellationToken cancellationToken);
     }
 }

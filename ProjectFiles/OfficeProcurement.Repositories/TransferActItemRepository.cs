@@ -53,5 +53,8 @@ namespace OfficeProcurement.Repositories
                 .ToListAsync(cancellationToken);
             return items;
         }
+
+        public Task<bool> HasItemsByProductIdAsync(Guid productId, CancellationToken cancellationToken)
+            => reader.Read<TransferActItem>().NotDeletedAt().AnyAsync(x => x.ProductId == productId, cancellationToken);
     }
 }
