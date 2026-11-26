@@ -14,15 +14,20 @@ namespace OfficeProcurement.Services;
 public class SupplierService : ISupplierService
 {
     private readonly ISupplierRepository supplierRepository;
+    private readonly IContractRepository contractRepository;
+    private readonly IProductRepository productRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса поставщиков
     /// </summary>
-    public SupplierService(ISupplierRepository supplierRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public SupplierService(ISupplierRepository supplierRepository, IContractRepository contractRepository,
+        IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.supplierRepository = supplierRepository;
+        this.contractRepository = contractRepository;
+        this.productRepository = productRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
@@ -100,6 +105,19 @@ public class SupplierService : ISupplierService
         {
             throw new EntityNotFoundException<Supplier>(id);
         }
+
+        var hasContracts = await contractRepository.HasContractsBySupplierIdAsync(id, cancellationToken);
+        if (hasContracts)
+        {
+            throw new OfficeProcurementInvalidOperationException("Нельзя удалить поставщика: существуют связанные договоры");
+        }
+
+        var hasProducts = await productRepository.HasProductsBySupplierIdAsync(id, cancellationToken);
+        if (hasProducts)
+        {
+            throw new OfficeProcurementInvalidOperationException("Нельзя удалить поставщика: существуют связанные товары");
+        }
+
         supplierRepository.Delete(entity);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

@@ -15,6 +15,7 @@ public class ProductService : IProductService
 {
     private readonly IProductRepository productRepository;
     private readonly ISupplierRepository supplierRepository;
+    private readonly ITransferActItemRepository transferActItemRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
@@ -23,10 +24,12 @@ public class ProductService : IProductService
     /// </summary>
     public ProductService(IProductRepository productRepository,
         ISupplierRepository supplierRepository,
+        ITransferActItemRepository transferActItemRepository,
         IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.productRepository = productRepository;
         this.supplierRepository = supplierRepository;
+        this.transferActItemRepository = transferActItemRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
@@ -117,6 +120,13 @@ public class ProductService : IProductService
         {
             throw new EntityNotFoundException<Product>(id);
         }
+
+        var hasItems = await transferActItemRepository.HasItemsByProductIdAsync(id, cancellationToken);
+        if (hasItems)
+        {
+            throw new OfficeProcurementInvalidOperationException("Нельзя удалить продукт: он используется в актах передачи");
+        }
+
         productRepository.Delete(entity);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

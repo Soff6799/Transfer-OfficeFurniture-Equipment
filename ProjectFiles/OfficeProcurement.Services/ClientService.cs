@@ -14,15 +14,17 @@ namespace OfficeProcurement.Services;
 public class ClientService : IClientService
 {
     private readonly IClientRepository clientRepository;
+    private readonly IContractRepository contractRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса клиентов
     /// </summary>
-    public ClientService(IClientRepository clientRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public ClientService(IClientRepository clientRepository, IContractRepository contractRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.clientRepository = clientRepository;
+        this.contractRepository = contractRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
@@ -97,6 +99,13 @@ public class ClientService : IClientService
         {
             throw new EntityNotFoundException<Client>(id);
         }
+
+        var hasContracts = await contractRepository.HasContractsByClientIdAsync(id, cancellationToken);
+        if (hasContracts)
+        {
+            throw new OfficeProcurementInvalidOperationException("Нельзя удалить клиента: существуют связанные договоры");
+        }
+
         clientRepository.Delete(entity);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
