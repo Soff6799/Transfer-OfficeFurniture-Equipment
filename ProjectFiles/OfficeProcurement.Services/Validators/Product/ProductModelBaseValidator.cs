@@ -34,6 +34,7 @@ public abstract class ProductModelBaseValidator<T> : AbstractValidator<T>
             .MaximumLength(20).WithMessage("Единица измерения не должна превышать 20 символов");
 
         RuleFor(x => x.UnitPrice)
-            .GreaterThan(0).WithMessage("Цена за единицу должна быть больше нуля");
+            .GreaterThan(0).WithMessage("Цена за единицу должна быть больше нуля")
+            .PrecisionScale(18, 2, false).WithMessage("Цена должна содержать не более 2 знаков после запятой");
     }
 }
