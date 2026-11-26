@@ -356,4 +356,29 @@ public class ProductServiceTests : BaseServiceTests
         await act.Should().ThrowAsync<EntityNotFoundException<Supplier>>();
     }
 
+    /// <summary>
+    /// Если продукт используется в позициях акта, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteProductShouldThrowExceptionIfTransferActItemsExist()
+    {
+        // Arrange
+        var product = new Product { Id = Guid.NewGuid(), Name = "Стол", Unit = "шт" };
+        var item = new TransferActItem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Стол",
+            Unit = "шт",
+            ProductId = product.Id
+        };
+        Add(product);
+        Add(item);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => productService.DeleteProduct(product.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+    }
+
+
 }

@@ -343,4 +343,36 @@ public class ContractServiceTests : BaseServiceTests
         var act = () => contractService.CreateContract(model, CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Client>>();
     }
+
+    /// <summary>
+    /// Если у договора есть связанные акты передачи, удаление выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task DeleteContractShouldThrowExceptionIfTransferActsExist()
+    {
+        // Arrange
+        var contract = new Contract
+        {
+            Id = Guid.NewGuid(),
+            Number = "Д-001",
+            SignedAt = DateTimeOffset.Now,
+            Type = ContractType.Supply
+        };
+        var transferAct = new TransferAct
+        {
+            Id = Guid.NewGuid(),
+            Number = "А-001",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва",
+            ContractId = contract.Id
+        };
+        Add(contract);
+        Add(transferAct);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        // Act & Assert
+        var act = () => contractService.DeleteContract(contract.Id, CancellationToken.None);
+        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+    }
+
 }
