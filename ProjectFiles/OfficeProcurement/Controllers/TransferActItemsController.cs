@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using OfficeProcurement.Common;
+using Microsoft.AspNetCore.Authorization;
 using OfficeProcurement.Models.TransferActItem;
 using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Contracts.Models;
@@ -10,6 +11,7 @@ namespace OfficeProcurement.Controllers;
 /// <summary>
 /// Работа с позициями актов передачи
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class TransferActItemsController : ControllerBase
@@ -86,6 +88,7 @@ public class TransferActItemsController : ControllerBase
     /// <summary>
     /// Удаляет позицию акта передачи по идентификатору
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

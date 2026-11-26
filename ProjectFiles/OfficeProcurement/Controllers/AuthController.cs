@@ -8,6 +8,7 @@ namespace OfficeProcurement.Controllers;
 /// <summary>
 /// Контроллер аутентификации
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
