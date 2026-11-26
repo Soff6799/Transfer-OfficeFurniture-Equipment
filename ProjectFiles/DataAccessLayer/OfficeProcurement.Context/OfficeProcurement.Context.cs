@@ -20,11 +20,15 @@ public class OfficeProcurementContext : DbContext,
     /// <summary>
     /// Инициирует новый экземпляр <see cref="OfficeProcurementContext"/>
     /// </summary>
-    public OfficeProcurementContext(DbContextOptions<OfficeProcurementContext> options)
+    public OfficeProcurementContext(DbContextOptions<OfficeProcurementContext> options,
+        IDateTimeProvider dateTimeProvider,
+        IIdentityProvider identityProvider)
         : base(options)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+        DateTimeProvider = dateTimeProvider;
+        IdentityProvider = identityProvider;
     }
 
     /// <inheridoc />
@@ -86,11 +90,8 @@ public class OfficeProcurementContext : DbContext,
 
     public IWriter Writer => this;
 
-    /// <inheritdoc/>
-    public IDateTimeProvider DateTimeProvider { get; } = new DateTimeProvider();
-
-    /// <inheritdoc/>
-    public IIdentityProvider IdentityProvider { get; } = new IdentityProvider();
+    public IDateTimeProvider DateTimeProvider { get; }
+    public IIdentityProvider IdentityProvider { get; }
 
     /// <summary>
     /// Вычисляет SHA256-хеш пароля. Используется только для сидинга тестовых данных

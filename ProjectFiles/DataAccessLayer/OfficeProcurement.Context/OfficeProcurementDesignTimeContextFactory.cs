@@ -1,5 +1,7 @@
+using OfficeProcurement.Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using OfficeProcurement.Infrastructure.Providers;
 
 namespace OfficeProcurement.Context;
 
@@ -26,14 +28,23 @@ public class OfficeProcurementDesignTimeContextFactory : IDesignTimeDbContextFac
     /// </summary>
     public OfficeProcurementContext CreateDbContext(string[] args)
     {
-        var connectionString = "Host=localhost;Port=5432;Database=OfficeProcurement;Username=postgres;Password=Qwerty54321";
+        var connectionString = "Host=localhost;Port=5432;Database=OfficeProcurement;Username=postgres;Password=CHANGE_ME";
         var options = new DbContextOptionsBuilder<OfficeProcurementContext>()
             .UseNpgsql(connectionString)
             .LogTo(Console.WriteLine)
             .Options;
 
-        return new OfficeProcurementContext(options);
+        return new OfficeProcurementContext(options,
+    new DateTimeProvider(),
+    new DesignTimeIdentityProvider());
 
+    }
+
+    private sealed class DesignTimeIdentityProvider : IIdentityProvider
+    {
+        public string Name => "DesignTime";
+        public Guid? UserId => null;
+        public string? Role => null;
     }
 
 }

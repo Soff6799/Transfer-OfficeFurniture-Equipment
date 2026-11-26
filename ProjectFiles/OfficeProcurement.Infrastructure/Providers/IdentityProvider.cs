@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
 using OfficeProcurement.Infrastructure.Common;
 
 namespace OfficeProcurement.Infrastructure.Providers;
@@ -9,26 +10,26 @@ namespace OfficeProcurement.Infrastructure.Providers;
 /// </summary>
 public class IdentityProvider : IIdentityProvider
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor httpContextAccessor;
 
     /// <summary>
     /// Инициирует новый экземпляр <see cref="IdentityProvider"/>.
     /// </summary>
     public IdentityProvider(IHttpContextAccessor httpContextAccessor)
     {
-        _httpContextAccessor = httpContextAccessor;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     /// <inheritdoc/>
     public string Name =>
-        _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Anonymous";
+        httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Anonymous";
 
     /// <summary>
     /// ID текущего пользователя из JWT-токена.
     /// </summary>
     public Guid UserId =>
         Guid.TryParse(
-            _httpContextAccessor.HttpContext?.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
+            httpContextAccessor.HttpContext?.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
             out var id)
             ? id
             : Guid.Empty;
@@ -36,5 +37,5 @@ public class IdentityProvider : IIdentityProvider
     /// Роль текущего пользователя из JWT-токена.
     /// </summary>
     public string Role =>
-        _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+        httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value ?? "User";
 }
