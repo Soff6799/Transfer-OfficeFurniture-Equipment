@@ -23,7 +23,8 @@ public class TransferActServiceTests : BaseServiceTests
     public TransferActServiceTests()
     {
         transferActRepository = new TransferActRepository(WriterContext, Context);
-        transferActService = new TransferActService(transferActRepository, UnitOfWork, Mapper);
+        var contractRepository = new ContractRepository(WriterContext, Context);
+        transferActService = new TransferActService(transferActRepository, contractRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -102,8 +103,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task CreateTransferActShouldSaveToDatabase()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActCreateModel
         {
+            ContractId = contract.Id,
             Number = "А-NEW",
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
@@ -128,12 +133,16 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task CreateTransferActShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var existing = new TransferAct { Number = "А-100", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         var model = new TransferActCreateModel
         {
+            ContractId = contract.Id,
             Number = "А-100",
             Date = DateOnly.FromDateTime(DateTime.Now),
             City = "Москва"
@@ -151,8 +160,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldChangeData()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-OLD",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -163,6 +176,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = entity.Id,
             Number = "А-UPDATED",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -186,8 +200,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-NOTEXIST",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -206,8 +224,12 @@ public class TransferActServiceTests : BaseServiceTests
     public async Task UpdateTransferActShouldThrowExceptionIfNumberExists()
     {
         // Arrange
+        var contract = new Contract { Id = Guid.NewGuid(), Number = "Д-BASE", SignedAt = DateTimeOffset.Now, Type = ContractType.Supply };
+        Add(contract);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity1 = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-001",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -215,6 +237,7 @@ public class TransferActServiceTests : BaseServiceTests
         };
         var entity2 = new TransferAct
         {
+            ContractId = contract.Id,
             Id = Guid.NewGuid(),
             Number = "А-002",
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -225,6 +248,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         var model = new TransferActModel
         {
+            ContractId = contract.Id,
             Id = entity1.Id,
             Number = "А-002",
             Date = DateOnly.FromDateTime(DateTime.Now),

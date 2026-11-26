@@ -23,7 +23,10 @@ public class TransferActItemServiceTests : BaseServiceTests
     public TransferActItemServiceTests()
     {
         transferActItemRepository = new TransferActItemRepository(WriterContext, Context);
-        transferActItemService = new TransferActItemService(transferActItemRepository, UnitOfWork, Mapper);
+        var transferActRepository = new TransferActRepository(WriterContext, Context);
+        var productRepository = new ProductRepository(WriterContext, Context);
+        transferActItemService = new TransferActItemService(transferActItemRepository, UnitOfWork, Mapper,
+            transferActRepository, productRepository);
     }
 
     /// <summary>
@@ -104,8 +107,15 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task CreateTransferActItemShouldSaveToDatabase()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActItemCreateModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Name = "Новая позиция",
             StockNumber = "ST-NEW",
             Unit = "шт",
@@ -131,8 +141,15 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task CreateTransferActItemWithoutStockNumberShouldSucceed()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActItemCreateModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Name = "Позиция без номера",
             StockNumber = null,
             Unit = "шт",
@@ -155,12 +172,19 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task CreateTransferActItemShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var existing = new TransferActItem { Name = "Старая", StockNumber = "ST-100", Unit = "шт" };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         var model = new TransferActItemCreateModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Name = "Новая",
             StockNumber = "ST-100",
             Unit = "шт",
@@ -180,8 +204,15 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task UpdateTransferActItemShouldChangeData()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity = new TransferActItem
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = Guid.NewGuid(),
             Name = "Старое название",
             StockNumber = "ST-OLD",
@@ -194,6 +225,8 @@ public class TransferActItemServiceTests : BaseServiceTests
 
         var model = new TransferActItemModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = entity.Id,
             Name = "Новое название",
             StockNumber = "ST-OLD",
@@ -220,8 +253,15 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task UpdateTransferActItemShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new TransferActItemModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = Guid.NewGuid(),
             Name = "Несуществующая",
             StockNumber = "ST-NO",
@@ -242,8 +282,15 @@ public class TransferActItemServiceTests : BaseServiceTests
     public async Task UpdateTransferActItemShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var actEntity = new TransferAct { Id = Guid.NewGuid(), Number = "А-BASE", Date = DateOnly.FromDateTime(DateTime.Now), City = "Москва" };
+        var product = new Product { Id = Guid.NewGuid(), Name = "Товар", Unit = "шт" };
+        Add(actEntity);
+        Add(product);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity1 = new TransferActItem
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = Guid.NewGuid(),
             Name = "Позиция 1",
             StockNumber = "ST-001",
@@ -251,6 +298,8 @@ public class TransferActItemServiceTests : BaseServiceTests
         };
         var entity2 = new TransferActItem
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = Guid.NewGuid(),
             Name = "Позиция 2",
             StockNumber = "ST-002",
@@ -261,6 +310,8 @@ public class TransferActItemServiceTests : BaseServiceTests
 
         var model = new TransferActItemModel
         {
+            TransferActId = actEntity.Id,
+            ProductId = product.Id,
             Id = entity1.Id,
             Name = "Позиция 1 обновлённая",
             StockNumber = "ST-002",

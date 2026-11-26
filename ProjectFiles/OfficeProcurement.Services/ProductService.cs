@@ -14,15 +14,19 @@ namespace OfficeProcurement.Services;
 public class ProductService : IProductService
 {
     private readonly IProductRepository productRepository;
+    private readonly ISupplierRepository supplierRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса продуктов
     /// </summary>
-    public ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public ProductService(IProductRepository productRepository,
+        ISupplierRepository supplierRepository,
+        IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.productRepository = productRepository;
+        this.supplierRepository = supplierRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
@@ -54,6 +58,12 @@ public class ProductService : IProductService
     /// </summary>
     async Task<ProductModel> IProductService.CreateProduct(ProductCreateModel productCreateModel, CancellationToken cancellationToken)
     {
+        var supplier = await supplierRepository.GetSupplierByIdAsync(productCreateModel.SupplierId, cancellationToken);
+        if (supplier is null)
+        {
+            throw new EntityNotFoundException<Supplier>(productCreateModel.SupplierId);
+        }
+
         if (productCreateModel.StockNumber is not null)
         {
             var existing = await productRepository.GetProductByStockNumberAsync(productCreateModel.StockNumber, cancellationToken);
@@ -74,6 +84,11 @@ public class ProductService : IProductService
     /// </summary>
     async Task IProductService.UpdateProduct(ProductModel productModel, CancellationToken cancellationToken)
     {
+        var supplier = await supplierRepository.GetSupplierByIdAsync(productModel.SupplierId, cancellationToken);
+        if (supplier is null)
+        {
+            throw new EntityNotFoundException<Supplier>(productModel.SupplierId);
+        }
         if (productModel.StockNumber is not null)
         {
             var existing = await productRepository.GetProductByStockNumberAsync(productModel.StockNumber, cancellationToken);

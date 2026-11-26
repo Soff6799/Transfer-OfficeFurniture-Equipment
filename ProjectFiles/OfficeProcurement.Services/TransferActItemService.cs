@@ -14,17 +14,24 @@ namespace OfficeProcurement.Services;
 public class TransferActItemService : ITransferActItemService
 {
     private readonly ITransferActItemRepository transferActItemRepository;
+    private readonly ITransferActRepository transferActRepository;
+    private readonly IProductRepository productRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса позиций акта передачи
     /// </summary>
-    public TransferActItemService(ITransferActItemRepository transferActItemRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public TransferActItemService(ITransferActItemRepository transferActItemRepository,
+        IUnitOfWork unitOfWork, IMapper mapper,
+        ITransferActRepository transferActRepository,
+        IProductRepository productRepository)
     {
         this.transferActItemRepository = transferActItemRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
+        this.transferActRepository = transferActRepository;
+        this.productRepository = productRepository;
     }
 
     /// <summary>
@@ -56,6 +63,18 @@ public class TransferActItemService : ITransferActItemService
     /// </summary>
     async Task<TransferActItemModel> ITransferActItemService.CreateTransferActItem(TransferActItemCreateModel transferActItemCreateModel, CancellationToken cancellationToken)
     {
+        var transferAct = await transferActRepository.GetTransferActByIdAsync(transferActItemCreateModel.TransferActId, cancellationToken);
+        if (transferAct is null)
+        {
+            throw new EntityNotFoundException<TransferAct>(transferActItemCreateModel.TransferActId);
+        }
+
+        var product = await productRepository.GetProductByIdAsync(transferActItemCreateModel.ProductId, cancellationToken);
+        if (product is null)
+        {
+            throw new EntityNotFoundException<Product>(transferActItemCreateModel.ProductId);
+        }
+
         if (transferActItemCreateModel.StockNumber is not null)
         {
             var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemCreateModel.StockNumber, cancellationToken);
@@ -76,6 +95,18 @@ public class TransferActItemService : ITransferActItemService
     /// </summary>
     async Task ITransferActItemService.UpdateTransferActItem(TransferActItemModel transferActItemModel, CancellationToken cancellationToken)
     {
+        var transferAct = await transferActRepository.GetTransferActByIdAsync(transferActItemModel.TransferActId, cancellationToken);
+        if (transferAct is null)
+        {
+            throw new EntityNotFoundException<TransferAct>(transferActItemModel.TransferActId);
+        }
+
+        var product = await productRepository.GetProductByIdAsync(transferActItemModel.ProductId, cancellationToken);
+        if (product is null)
+        {
+            throw new EntityNotFoundException<Product>(transferActItemModel.ProductId);
+        }
+
         if (transferActItemModel.StockNumber is not null)
         {
             var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemModel.StockNumber, cancellationToken);

@@ -23,7 +23,8 @@ public class ProductServiceTests : BaseServiceTests
     public ProductServiceTests()
     {
         productRepository = new ProductRepository(WriterContext, Context);
-        productService = new ProductService(productRepository, UnitOfWork, Mapper);
+        var supplierRepository = new SupplierRepository(WriterContext, Context);
+        productService = new ProductService(productRepository, supplierRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
@@ -103,8 +104,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductShouldSaveToDatabase()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Новый продукт",
             StockNumber = "ST-NEW",
             Unit = "шт",
@@ -131,8 +136,13 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductWithoutStockNumberShouldSucceed()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Продукт без номера",
             StockNumber = null,  // Нет складского номера
             Unit = "шт",
@@ -154,12 +164,17 @@ public class ProductServiceTests : BaseServiceTests
     public async Task CreateProductShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var existing = new Product { Name = "Старый", StockNumber = "ST-100", Unit = "шт" };
         Add(existing);
         await UnitOfWork.SaveChangesAsync(CancellationToken.None);
 
         var model = new ProductCreateModel
         {
+            SupplierId = supplier.Id,
             Name = "Новый",
             StockNumber = "ST-100",  // Тот же номер
             Unit = "шт",
@@ -178,8 +193,13 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldChangeData()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
         var entity = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Старое название",
             StockNumber = "ST-OLD",
@@ -191,6 +211,7 @@ public class ProductServiceTests : BaseServiceTests
 
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = entity.Id,
             Name = "Новое название",
             StockNumber = "ST-OLD",
@@ -215,8 +236,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldThrowExceptionIfNotFound()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Несуществующий",
             StockNumber = "ST-NO",
@@ -236,8 +261,12 @@ public class ProductServiceTests : BaseServiceTests
     public async Task UpdateProductShouldThrowExceptionIfStockNumberExists()
     {
         // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "1234567890" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
         var entity1 = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Продукт 1",
             StockNumber = "ST-001",
@@ -245,6 +274,7 @@ public class ProductServiceTests : BaseServiceTests
         };
         var entity2 = new Product
         {
+            SupplierId = supplier.Id,
             Id = Guid.NewGuid(),
             Name = "Продукт 2",
             StockNumber = "ST-002",
@@ -255,6 +285,7 @@ public class ProductServiceTests : BaseServiceTests
 
         var model = new ProductModel
         {
+            SupplierId = supplier.Id,
             Id = entity1.Id,
             Name = "Продукт 1 обновлённый",
             StockNumber = "ST-002",  // Номер уже занят entity2
