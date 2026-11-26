@@ -38,7 +38,8 @@ public class TransferActConfiguration : IEntityTypeConfiguration<TransferAct>
 
         builder.HasIndex(x => x.Number)
             .HasDatabaseName("IX_TransferActs_Number")
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
     }
 
 }

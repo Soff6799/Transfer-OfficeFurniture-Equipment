@@ -101,7 +101,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("Inn")
                         .IsUnique()
-                        .HasDatabaseName("IX_Clients_Inn");
+                        .HasDatabaseName("IX_Clients_Inn")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.ToTable("Clients", (string)null);
                 });
@@ -156,7 +157,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("Number")
                         .IsUnique()
-                        .HasDatabaseName("IX_Contracts_Number");
+                        .HasDatabaseName("IX_Contracts_Number")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.HasIndex("SupplierId");
 
@@ -219,7 +221,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("StockNumber")
                         .IsUnique()
-                        .HasDatabaseName("IX_Products_StockNumber");
+                        .HasDatabaseName("IX_Products_StockNumber")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.HasIndex("SupplierId");
 
@@ -305,7 +308,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("Inn")
                         .IsUnique()
-                        .HasDatabaseName("IX_Suppliers_Inn");
+                        .HasDatabaseName("IX_Suppliers_Inn")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.ToTable("Suppliers", (string)null);
                 });
@@ -357,7 +361,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("Number")
                         .IsUnique()
-                        .HasDatabaseName("IX_TransferActs_Number");
+                        .HasDatabaseName("IX_TransferActs_Number")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.ToTable("TransferActs", (string)null);
                 });
@@ -426,7 +431,8 @@ namespace OfficeProcurement.Context.Migrations
 
                     b.HasIndex("StockNumber")
                         .IsUnique()
-                        .HasDatabaseName("IX_TransferActItems_StockNumber");
+                        .HasDatabaseName("IX_TransferActItems_StockNumber")
+                        .HasFilter("\"DeletedAt\" IS NULL");
 
                     b.HasIndex("TransferActId");
 

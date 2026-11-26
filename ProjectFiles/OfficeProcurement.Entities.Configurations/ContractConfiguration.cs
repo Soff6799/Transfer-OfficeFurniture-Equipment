@@ -44,6 +44,7 @@ public class ContractConfiguration : IEntityTypeConfiguration<Contract>
 
         builder.HasIndex(x => x.Number)
             .HasDatabaseName("IX_Contracts_Number")
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
     }
 }

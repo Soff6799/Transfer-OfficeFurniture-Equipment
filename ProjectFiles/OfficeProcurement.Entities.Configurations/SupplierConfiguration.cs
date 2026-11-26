@@ -61,7 +61,8 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 
         builder.HasIndex(x => x.Inn)
             .HasDatabaseName("IX_Suppliers_Inn")
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         builder.HasIndex(x => x.ContactLastName)
             .HasDatabaseName("IX_Suppliers_ContactLastName");
