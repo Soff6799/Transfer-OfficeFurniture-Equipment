@@ -35,6 +35,7 @@ public class ContractsController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<ContractApiModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var contracts = await contractService.GetContracts(cancellationToken);
@@ -47,6 +48,7 @@ public class ContractsController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<ContractApiModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var contract = await contractService.GetContractById(id, cancellationToken);
@@ -57,15 +59,17 @@ public class ContractsController : ControllerBase
     /// Создаёт новый договор
     /// </summary>
     [HttpPost]
-    [ProducesResponseType<ContractApiModel>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType<ContractApiModel>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] ContractCreateApiModel createModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ContractCreateModel>(createModel);
         await validateService.ValidateAsync(mapped, cancellationToken);
         var result = await contractService.CreateContract(mapped, cancellationToken);
-        return Ok(mapper.Map<ContractApiModel>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, mapper.Map<ContractApiModel>(result));
     }
 
     /// <summary>
@@ -73,9 +77,11 @@ public class ContractsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ContractCreateApiModel updateModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ContractModel>(updateModel);
@@ -92,6 +98,8 @@ public class ContractsController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await contractService.DeleteContract(id, cancellationToken);

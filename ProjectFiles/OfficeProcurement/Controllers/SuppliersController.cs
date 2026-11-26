@@ -35,6 +35,7 @@ public class SuppliersController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<SupplierApiModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var suppliers = await supplierService.GetSuppliers(cancellationToken);
@@ -47,6 +48,7 @@ public class SuppliersController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<SupplierApiModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var supplier = await supplierService.GetSupplierById(id, cancellationToken);
@@ -57,15 +59,17 @@ public class SuppliersController : ControllerBase
     /// Создаёт нового поставщика
     /// </summary>
     [HttpPost]
-    [ProducesResponseType<SupplierApiModel>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType<SupplierApiModel>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] SupplierCreateApiModel createModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<SupplierCreateModel>(createModel);
         await validateService.ValidateAsync(mapped, cancellationToken);
         var result = await supplierService.CreateSupplier(mapped, cancellationToken);
-        return Ok(mapper.Map<SupplierApiModel>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, mapper.Map<SupplierApiModel>(result));
     }
 
     /// <summary>
@@ -73,9 +77,11 @@ public class SuppliersController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] SupplierCreateApiModel updateModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<SupplierModel>(updateModel);
@@ -92,6 +98,8 @@ public class SuppliersController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await supplierService.DeleteSupplier(id, cancellationToken);

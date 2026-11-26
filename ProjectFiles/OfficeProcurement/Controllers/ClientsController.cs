@@ -41,6 +41,7 @@ public class ClientsController : ControllerBase
     /// <returns>Коллекция клиентов</returns>
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<ClientApiModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var clients = await clientService.GetClients(cancellationToken);
@@ -56,6 +57,7 @@ public class ClientsController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<ClientApiModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var client = await clientService.GetClientById(id, cancellationToken);
@@ -69,15 +71,17 @@ public class ClientsController : ControllerBase
     /// <param name="cancellationToken">Токен отмены операции</param>
     /// <returns>Созданный клиент</returns>
     [HttpPost]
-    [ProducesResponseType<ClientApiModel>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType<ClientApiModel>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] ClientCreateApiModel createModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ClientCreateModel>(createModel);
         await validateService.ValidateAsync(mapped, cancellationToken);
         var result = await clientService.CreateClient(mapped, cancellationToken);
-        return Ok(mapper.Map<ClientApiModel>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, mapper.Map<ClientApiModel>(result));
     }
 
     /// <summary>
@@ -88,9 +92,11 @@ public class ClientsController : ControllerBase
     /// <param name="cancellationToken">Токен отмены операции</param>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ClientCreateApiModel updateModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ClientModel>(updateModel);
@@ -109,6 +115,8 @@ public class ClientsController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await clientService.DeleteClient(id, cancellationToken);
