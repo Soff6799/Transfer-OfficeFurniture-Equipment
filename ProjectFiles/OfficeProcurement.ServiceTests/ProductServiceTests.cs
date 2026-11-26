@@ -184,7 +184,7 @@ public class ProductServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => productService.CreateProduct(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>
@@ -296,7 +296,7 @@ public class ProductServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => productService.UpdateProduct(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>

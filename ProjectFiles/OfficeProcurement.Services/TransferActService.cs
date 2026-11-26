@@ -71,7 +71,7 @@ public class TransferActService : ITransferActService
         var existing = await transferActRepository.GetTransferActByNumberAsync(transferActCreateModel.Number, cancellationToken);
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Акт с номером '{transferActCreateModel.Number}' уже существует");
+            throw new OfficeProcurementConflictException($"Акт с номером '{transferActCreateModel.Number}' уже существует");
         }
 
         var entity = mapper.Map<TransferAct>(transferActCreateModel);
@@ -95,7 +95,7 @@ public class TransferActService : ITransferActService
         var existing = await transferActRepository.GetTransferActByNumberAsync(transferActModel.Number, cancellationToken);
         if (existing is not null && existing.Id != transferActModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Акт с номером '{transferActModel.Number}' уже существует");
+            throw new OfficeProcurementConflictException($"Акт с номером '{transferActModel.Number}' уже существует");
         }
 
         var entity = await transferActRepository.GetTransferActByIdAsync(transferActModel.Id, cancellationToken);

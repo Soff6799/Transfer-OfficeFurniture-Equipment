@@ -63,7 +63,7 @@ public class SupplierService : ISupplierService
 
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Поставщик с ИНН '{supplierCreateModel.Inn}' уже существует");
+            throw new OfficeProcurementConflictException($"Поставщик с ИНН '{supplierCreateModel.Inn}' уже существует");
         }
         var entity = mapper.Map<Supplier>(supplierCreateModel);
         supplierRepository.Add(entity);
@@ -81,7 +81,7 @@ public class SupplierService : ISupplierService
 
         if (existing is not null && existing.Id != supplierModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Поставщик с ИНН '{supplierModel.Inn}' уже существует");
+            throw new OfficeProcurementConflictException($"Поставщик с ИНН '{supplierModel.Inn}' уже существует");
         }
         var entity = await supplierRepository.GetSupplierByIdAsync(supplierModel.Id, cancellationToken);
 

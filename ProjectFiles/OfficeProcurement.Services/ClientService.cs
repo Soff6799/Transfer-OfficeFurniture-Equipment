@@ -60,7 +60,7 @@ public class ClientService : IClientService
         var existing = await clientRepository.GetClientByInnAsync(clientCreateModel.Inn, cancellationToken);
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Клиент с ИНН '{clientCreateModel.Inn}' уже существует");
+            throw new OfficeProcurementConflictException($"Клиент с ИНН '{clientCreateModel.Inn}' уже существует");
         }
         var entity = mapper.Map<Client>(clientCreateModel);
         clientRepository.Add(entity);
@@ -77,7 +77,7 @@ public class ClientService : IClientService
         var existingByInn = await clientRepository.GetClientByInnAsync(clientModel.Inn, cancellationToken);
         if (existingByInn is not null && existingByInn.Id != clientModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Клиент с ИНН '{clientModel.Inn}' уже существует");
+            throw new OfficeProcurementConflictException($"Клиент с ИНН '{clientModel.Inn}' уже существует");
         }
         var entity = await clientRepository.GetClientByIdAsync(clientModel.Id, cancellationToken);
         if (entity is null)

@@ -145,7 +145,7 @@ public class SupplierServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => supplierService.CreateSupplier(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>
@@ -230,7 +230,7 @@ public class SupplierServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => supplierService.UpdateSupplier(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>

@@ -80,7 +80,7 @@ public class TransferActItemService : ITransferActItemService
             var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemCreateModel.StockNumber, cancellationToken);
             if (existing is not null)
             {
-                throw new OfficeProcurementInvalidOperationException($"Позиция со складским номером '{transferActItemCreateModel.StockNumber}' уже существует");
+                throw new OfficeProcurementConflictException($"Позиция со складским номером '{transferActItemCreateModel.StockNumber}' уже существует");
             }
         }
         var entity = mapper.Map<TransferActItem>(transferActItemCreateModel);
@@ -112,7 +112,7 @@ public class TransferActItemService : ITransferActItemService
             var existing = await transferActItemRepository.GetTransferActItemByStockNumberAsync(transferActItemModel.StockNumber, cancellationToken);
             if (existing is not null && existing.Id != transferActItemModel.Id)
             {
-                throw new OfficeProcurementInvalidOperationException($"Позиция со складским номером '{transferActItemModel.StockNumber}' уже существует");
+                throw new OfficeProcurementConflictException($"Позиция со складским номером '{transferActItemModel.StockNumber}' уже существует");
             }
         }
         var entity = await transferActItemRepository.GetTransferActItemByIdAsync(transferActItemModel.Id, cancellationToken);
