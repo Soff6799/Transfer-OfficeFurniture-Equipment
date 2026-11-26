@@ -295,4 +295,25 @@ public class TransferActServiceTests : BaseServiceTests
         var act = () => transferActService.DeleteTransferAct(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<TransferAct>>();
     }
+
+    /// <summary>
+    /// Если договор не найден при создании акта, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateTransferActShouldThrowExceptionIfContractNotFound()
+    {
+        // Arrange
+        var model = new TransferActCreateModel
+        {
+            Number = "А-ERR",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва",
+            ContractId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        var act = () => transferActService.CreateTransferAct(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Contract>>();
+    }
+
 }

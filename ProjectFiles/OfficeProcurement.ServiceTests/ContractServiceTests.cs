@@ -317,4 +317,29 @@ public class ContractServiceTests : BaseServiceTests
         var act = () => contractService.DeleteContract(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Contract>>();
     }
+
+    /// <summary>
+    /// Если клиент не найден при создании договора, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateContractShouldThrowExceptionIfClientNotFound()
+    {
+        // Arrange
+        var supplier = new Supplier { Id = Guid.NewGuid(), Inn = "0987654321" };
+        Add(supplier);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        var model = new ContractCreateModel
+        {
+            Number = "Д-ERR",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            Type = ContractType.Supply,
+            ClientId = Guid.NewGuid(),
+            SupplierId = supplier.Id
+        };
+
+        // Act & Assert
+        var act = () => contractService.CreateContract(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Client>>();
+    }
 }

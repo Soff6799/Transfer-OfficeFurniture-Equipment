@@ -360,4 +360,38 @@ public class TransferActItemServiceTests : BaseServiceTests
         var act = () => transferActItemService.DeleteTransferActItem(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<TransferActItem>>();
     }
+
+    /// <summary>
+    /// Если продукт не найден при создании позиции акта, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateTransferActItemShouldThrowExceptionIfProductNotFound()
+    {
+        // Arrange
+        var actEntity = new TransferAct
+        {
+            Id = Guid.NewGuid(),
+            Number = "А-BASE",
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            City = "Москва"
+        };
+        Add(actEntity);
+        await UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        var model = new TransferActItemCreateModel
+        {
+            Name = "Позиция с несуществующим товаром",
+            StockNumber = "ST-ERR",
+            Unit = "шт",
+            Quantity = 1,
+            UnitPrice = 1000,
+            TransferActId = actEntity.Id,
+            ProductId = Guid.NewGuid() // Несуществующий товар
+        };
+
+        // Act & Assert
+        var act = () => transferActItemService.CreateTransferActItem(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Product>>();
+    }
+
 }

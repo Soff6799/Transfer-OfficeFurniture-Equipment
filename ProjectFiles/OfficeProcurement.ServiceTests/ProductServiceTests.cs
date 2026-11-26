@@ -333,4 +333,26 @@ public class ProductServiceTests : BaseServiceTests
         var act = () => productService.DeleteProduct(Guid.NewGuid(), CancellationToken.None);
         await act.Should().ThrowAsync<EntityNotFoundException<Product>>();
     }
+
+    /// <summary>
+    /// Если поставщик не найден при создании продукта, выбрасывает исключение
+    /// </summary>
+    [Fact]
+    public async Task CreateProductShouldThrowExceptionIfSupplierNotFound()
+    {
+        // Arrange
+        var model = new ProductCreateModel
+        {
+            Name = "Новый продукт",
+            StockNumber = "ST-ERR",
+            Unit = "шт",
+            UnitPrice = 5000,
+            SupplierId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        var act = () => productService.CreateProduct(model, CancellationToken.None);
+        await act.Should().ThrowAsync<EntityNotFoundException<Supplier>>();
+    }
+
 }
