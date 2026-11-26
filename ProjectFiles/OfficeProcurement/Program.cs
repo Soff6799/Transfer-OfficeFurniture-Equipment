@@ -1,6 +1,10 @@
 using System.Reflection;
+using System.Text;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using OfficeProcurement.Automapper;
 using OfficeProcurement.Common;
@@ -20,10 +24,30 @@ using OfficeProcurement.Services.Contracts.Models;
 using OfficeProcurement.Services.Implementations;
 using OfficeProcurement.Services.Validators.Client;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddUserSecrets<Program>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-builder.Services.AddSingleton<IIdentityProvider, IdentityProvider>();
+builder.Services.AddScoped<IIdentityProvider, IdentityProvider>();
 
 builder.Services.AddAutoMapper(x =>
 {
@@ -56,6 +80,7 @@ builder.Services.AddScoped<ITransferActItemService, TransferActItemService>();
 builder.Services.AddScoped<ITransferActService, TransferActService>();
 
 builder.Services.AddScoped<ITransferActExcelService, TransferActExcelService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(ClientCreateModelValidator).Assembly);
 builder.Services.AddScoped<IValidateService, ValidateService>();
@@ -68,6 +93,20 @@ builder.Services.AddSwaggerGen(c =>
         Title = "Office Procurement API",
         Version = "v1",
         Description = "API для управления офисными закупками"
+    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Введите JWT-токен, полученный из /api/Auth/login"
+    });
+
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
 
@@ -88,6 +127,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

@@ -1,15 +1,18 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using OfficeProcurement.Common;
+using Microsoft.AspNetCore.Authorization;
 using OfficeProcurement.Models.Product;
 using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Contracts.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace OfficeProcurement.Controllers;
 
 /// <summary>
 /// Работа с продуктами
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class ProductsController : ControllerBase
@@ -86,6 +89,7 @@ public class ProductsController : ControllerBase
     /// <summary>
     /// Удаляет продукт по идентификатору
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

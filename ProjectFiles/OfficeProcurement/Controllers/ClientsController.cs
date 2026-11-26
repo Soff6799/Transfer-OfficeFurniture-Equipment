@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OfficeProcurement.Models;
 using OfficeProcurement.Common;
 using OfficeProcurement.Models.Client;
+using Microsoft.AspNetCore.Authorization;
 using OfficeProcurement.Services.Contracts.Interface;
 using OfficeProcurement.Services.Contracts.Models;
 
@@ -11,6 +12,7 @@ namespace OfficeProcurement.Api.Controllers;
 /// <summary>
 /// Работа с клиентами
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class ClientsController : ControllerBase
@@ -103,6 +105,7 @@ public class ClientsController : ControllerBase
     /// </summary>
     /// <param name="id">Идентификатор клиента</param>
     /// <param name="cancellationToken">Токен отмены операции</param>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

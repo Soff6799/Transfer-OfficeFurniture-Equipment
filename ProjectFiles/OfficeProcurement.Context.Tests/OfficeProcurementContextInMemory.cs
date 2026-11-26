@@ -11,8 +11,6 @@ namespace OfficeProcurement.Context.Tests;
 /// </summary>
 public class OfficeProcurementContextInMemory : OfficeProcurementContext, IDbWriterContext
 {
-    private readonly IDateTimeProvider dateTimeProvider;
-    private readonly IIdentityProvider identityProvider;
 
     /// <summary>
     /// Инициализирует тестовый контекст
@@ -20,20 +18,13 @@ public class OfficeProcurementContextInMemory : OfficeProcurementContext, IDbWri
     public OfficeProcurementContextInMemory(
         IDateTimeProvider? dateTimeProvider = null,
         IIdentityProvider? identityProvider = null)
-        : base(new DbContextOptionsBuilder<OfficeProcurementContext>()
+        : base(
+            new DbContextOptionsBuilder<OfficeProcurementContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options)
+            .Options,
+            dateTimeProvider ?? new DateTimeProvider(),
+            identityProvider ?? new TestIdentityProvider())
     {
-        this.dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
-        this.identityProvider = identityProvider ?? new IdentityProvider();
     }
 
-    /// <inheritdoc/>
-    public IWriter Writer => this;
-
-    /// <inheritdoc/>
-    public IDateTimeProvider DateTimeProvider => dateTimeProvider;
-
-    /// <inheritdoc/>
-    public IIdentityProvider IdentityProvider => identityProvider;
 }

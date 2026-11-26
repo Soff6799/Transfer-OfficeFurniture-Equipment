@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeProcurement.Common;
 using OfficeProcurement.Models.Supplier;
@@ -10,6 +11,7 @@ namespace OfficeProcurement.Controllers;
 /// <summary>
 /// Работа с поставщиками
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class SuppliersController : ControllerBase
@@ -86,6 +88,7 @@ public class SuppliersController : ControllerBase
     /// <summary>
     /// Удаляет поставщика по идентификатору
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
