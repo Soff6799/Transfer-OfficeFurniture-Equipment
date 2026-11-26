@@ -14,6 +14,7 @@ namespace OfficeProcurement.Services;
 public class TransferActService : ITransferActService
 {
     private readonly ITransferActRepository transferActRepository;
+    private readonly ITransferActItemRepository transferActItemRepository;
     private readonly IUnitOfWork unitOfWork;
     private readonly IContractRepository contractRepository;
     private readonly IMapper mapper;
@@ -22,10 +23,12 @@ public class TransferActService : ITransferActService
     /// Инициализирует новый экземпляр сервиса актов передачи
     /// </summary>
     public TransferActService(ITransferActRepository transferActRepository,
+        ITransferActItemRepository transferActItemRepository,
         IContractRepository contractRepository,
         IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.transferActRepository = transferActRepository;
+        this.transferActItemRepository = transferActItemRepository;
         this.contractRepository = contractRepository;
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
@@ -115,6 +118,13 @@ public class TransferActService : ITransferActService
         if (entity is null)
         {
             throw new EntityNotFoundException<TransferAct>(id);
+        }
+
+        // Мягкий каскад
+        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(id, cancellationToken);
+        foreach (var item in items)
+        {
+            transferActItemRepository.Delete(item);
         }
 
         transferActRepository.Delete(entity);

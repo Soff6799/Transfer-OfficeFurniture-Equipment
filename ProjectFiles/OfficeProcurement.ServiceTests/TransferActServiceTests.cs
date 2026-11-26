@@ -23,8 +23,9 @@ public class TransferActServiceTests : BaseServiceTests
     public TransferActServiceTests()
     {
         transferActRepository = new TransferActRepository(WriterContext, Context);
+        var transferActItemRepository = new TransferActItemRepository(WriterContext, Context);
         var contractRepository = new ContractRepository(WriterContext, Context);
-        transferActService = new TransferActService(transferActRepository, contractRepository, UnitOfWork, Mapper);
+        transferActService = new TransferActService(transferActRepository, transferActItemRepository, contractRepository, UnitOfWork, Mapper);
     }
 
     /// <summary>
