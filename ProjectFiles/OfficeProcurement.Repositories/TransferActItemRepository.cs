@@ -48,6 +48,7 @@ namespace OfficeProcurement.Repositories
         public async Task<IReadOnlyCollection<TransferActItem>> GetTransferActItemsByTransferActIdAsync(Guid transferActId, CancellationToken cancellationToken)
         {
             var items = await reader.Read<TransferActItem>()
+                .NotDeletedAt()
                 .Where(x => x.TransferActId == transferActId)
                 .ToListAsync(cancellationToken);
             return items;

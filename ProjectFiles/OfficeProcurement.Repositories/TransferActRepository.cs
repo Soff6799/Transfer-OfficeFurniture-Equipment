@@ -48,6 +48,7 @@ namespace OfficeProcurement.Repositories
         public async Task<TransferAct?> GetTransferActWithContractByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await reader.Read<TransferAct>()
+                .NotDeletedAt()
                 .Include(x => x.Contract)
                     .ThenInclude(c => c.Client)
                 .Include(x => x.Contract)
