@@ -1,4 +1,5 @@
 using DocumentFormat.OpenXml;
+using System.Globalization;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OfficeProcurement.Dal.Contracts.Repositories;
@@ -15,6 +16,7 @@ namespace OfficeProcurement.Services.Implementations;
 /// </summary>
 public class TransferActExcelService : ITransferActExcelService
 {
+    private const decimal VatRate = 0.20m;
     private readonly ITransferActRepository transferActRepository;
     private readonly ITransferActItemRepository transferActItemRepository;
 
@@ -71,7 +73,8 @@ public class TransferActExcelService : ITransferActExcelService
             AppendRow(sheetData, [$"к договору купли-продажи №{contract.Number}"], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
-            AppendRow(sheetData, [$"г. {transferAct.City}", "", "", "", "", $"«{transferAct.Date.Day}» {GetMonthName(transferAct.Date.Month)} {transferAct.Date.Year} года"]);
+            AppendRow(sheetData, [$"г. {transferAct.City}", "", "", "", "",
+                $"«{transferAct.Date.Day}» {GetMonthName(transferAct.Date.Month)} {transferAct.Date.Year} года"]);
             AppendRow(sheetData, Array.Empty<string>());
 
             AppendRow(sheetData, [ $"{seller.CompanyName}, именуемое в дальнейшем «Продавец», в лице директора, действующего на основании {seller.CeoBasis}, " +
@@ -81,7 +84,8 @@ public class TransferActExcelService : ITransferActExcelService
             AppendRow(sheetData, ["1. Продавец передал, а покупатель принял в собственность следующее имущество:"]);
             AppendRow(sheetData, Array.Empty<string>());
 
-            AppendRow(sheetData, ["№ п/п", "Наименование имущества", "Ед. изм.", "Кол-во", "Цена за ед. (руб.)", "НДС 20% (руб.)", "Общая стоимость (руб.)"], true, true);
+            AppendRow(sheetData, ["№ п/п", "Наименование имущества", "Ед. изм.", "Кол-во", "Цена за ед. (руб.)",
+                $"НДС {(int)(VatRate * 100)}% (руб.)", "Общая стоимость (руб.)"], true, true);
 
             decimal totalSum = 0;
             decimal totalVat = 0;
@@ -89,7 +93,7 @@ public class TransferActExcelService : ITransferActExcelService
             {
                 var item = itemList[i];
                 var sum = item.Quantity * item.UnitPrice;
-                var vat = sum * 0.20m;
+                var vat = sum * VatRate;
                 totalSum += sum;
                 totalVat += vat;
 
@@ -98,15 +102,18 @@ public class TransferActExcelService : ITransferActExcelService
                 (i + 1).ToString(),
                 item.Name,
                 item.Unit,
-                ((int)item.Quantity).ToString(),
+                item.Quantity.ToString("0.###", CultureInfo.InvariantCulture),
                 item.UnitPrice.ToString("F2"),
                 vat.ToString("F2"),
                 sum.ToString("F2")
             ]);
             }
 
+            var rubles = (int)totalSum;
+            var kopecks = (int)Math.Round((totalSum - rubles) * 100);
+
             AppendRow(sheetData, Array.Empty<string>());
-            AppendRow(sheetData, [$"ИТОГО: {totalSum:F2} рублей 00 копеек, в т.ч. НДС {totalVat:F2} рублей."], true, true);
+            AppendRow(sheetData, [$"ИТОГО: {rubles} рублей {kopecks:D2} копеек, в т.ч. НДС {totalVat:F2} рублей."], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
             AppendRow(sheetData, ["2. Стороны совместно при приеме-передаче имущества произвели его осмотр и пришли к соглашению, " +
