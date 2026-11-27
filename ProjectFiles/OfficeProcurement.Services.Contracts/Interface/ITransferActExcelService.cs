@@ -10,5 +10,5 @@ public interface ITransferActExcelService
     /// <summary>
     /// Экспортирует акт передачи в формате Excel
     /// </summary>
-    Task<byte[]> ExportTransferActAsync(Guid transferActId, CancellationToken cancellationToken);
+    Task<byte[]> ExportTransferActAsync(TransferActModel act, CancellationToken cancellationToken);
 }

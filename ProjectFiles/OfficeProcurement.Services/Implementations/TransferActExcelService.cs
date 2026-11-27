@@ -4,7 +4,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
+using OfficeProcurement.Services.Contracts.Exceptions;
 using OfficeProcurement.Services.Contracts.Interface;
+using OfficeProcurement.Services.Contracts.Models;
 
 namespace OfficeProcurement.Services.Implementations;
 
@@ -28,19 +30,19 @@ public class TransferActExcelService : ITransferActExcelService
     }
 
     /// <inheritdoc/>
-    public async Task<byte[]> ExportTransferActAsync(Guid transferActId, CancellationToken cancellationToken)
+    public async Task<byte[]> ExportTransferActAsync(TransferActModel act, CancellationToken cancellationToken)
     {
-        var transferAct = await transferActRepository.GetTransferActWithContractByIdAsync(transferActId, cancellationToken);
+        var transferAct = await transferActRepository.GetTransferActWithContractByIdAsync(act.Id, cancellationToken);
         if (transferAct?.Contract == null)
         {
-            throw new InvalidOperationException($"Акт передачи или договор не найден");
+            throw new EntityNotFoundException<TransferAct>(act.Id);
         }
 
         var contract = transferAct.Contract;
         var seller = contract.Supplier;
         var buyer = contract.Client;
 
-        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(transferActId, cancellationToken);
+        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(act.Id, cancellationToken);
         var itemList = items?.ToList() ?? new List<TransferActItem>();
 
         using var stream = new MemoryStream();
