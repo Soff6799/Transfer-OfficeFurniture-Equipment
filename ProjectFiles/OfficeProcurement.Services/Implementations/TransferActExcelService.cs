@@ -121,8 +121,13 @@ public class TransferActExcelService : ITransferActExcelService
             AppendRow(sheetData, ["Продавец:", "", "", "", "", "Покупатель:"], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
-            var sellerDirector = $"{seller.ContactLastName} {seller.ContactName[0]}.{(seller.ContactPatronymic?.Length > 0 ? seller.ContactPatronymic[0] + "." : "")}";
-            var buyerDirector = $"{buyer.ContactLastName} {buyer.ContactName[0]}.{(buyer.ContactPatronymic?.Length > 0 ? buyer.ContactPatronymic[0] + "." : "")}";
+            var sellerNameInitial = seller.ContactName is { Length: > 0 } ? $" {seller.ContactName[0]}." : "";
+            var sellerPatronymicInitial = seller.ContactPatronymic is { Length: > 0 } ? $"{seller.ContactPatronymic[0]}." : "";
+            var sellerDirector = $"{seller.ContactLastName}{sellerNameInitial}{sellerPatronymicInitial}";
+
+            var buyerNameInitial = buyer.ContactName is { Length: > 0 } ? $" {buyer.ContactName[0]}." : "";
+            var buyerPatronymicInitial = buyer.ContactPatronymic is { Length: > 0 } ? $"{buyer.ContactPatronymic[0]}." : "";
+            var buyerDirector = $"{buyer.ContactLastName}{buyerNameInitial}{buyerPatronymicInitial}";
 
             AppendRow(sheetData, [$"Директор {sellerDirector}", "", "", "", "", $"Директор {buyerDirector}"]);
             AppendRow(sheetData, Array.Empty<string>());
