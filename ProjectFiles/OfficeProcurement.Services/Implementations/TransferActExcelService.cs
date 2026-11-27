@@ -1,10 +1,13 @@
 using DocumentFormat.OpenXml;
+using System.Globalization;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OfficeProcurement.Dal.Contracts.Repositories;
 using OfficeProcurement.Entities;
 using OfficeProcurement.Repositories.Contracts;
+using OfficeProcurement.Services.Contracts.Exceptions;
 using OfficeProcurement.Services.Contracts.Interface;
+using OfficeProcurement.Services.Contracts.Models;
 
 namespace OfficeProcurement.Services.Implementations;
 
@@ -13,6 +16,7 @@ namespace OfficeProcurement.Services.Implementations;
 /// </summary>
 public class TransferActExcelService : ITransferActExcelService
 {
+    private const decimal VatRate = 0.20m;
     private readonly ITransferActRepository transferActRepository;
     private readonly ITransferActItemRepository transferActItemRepository;
 
@@ -28,19 +32,19 @@ public class TransferActExcelService : ITransferActExcelService
     }
 
     /// <inheritdoc/>
-    public async Task<byte[]> ExportTransferActAsync(Guid transferActId, CancellationToken cancellationToken)
+    public async Task<byte[]> ExportTransferActAsync(TransferActModel act, CancellationToken cancellationToken)
     {
-        var transferAct = await transferActRepository.GetTransferActWithContractByIdAsync(transferActId, cancellationToken);
+        var transferAct = await transferActRepository.GetTransferActWithContractByIdAsync(act.Id, cancellationToken);
         if (transferAct?.Contract == null)
         {
-            throw new InvalidOperationException($"Акт передачи или договор не найден");
+            throw new EntityNotFoundException<TransferAct>(act.Id);
         }
 
         var contract = transferAct.Contract;
         var seller = contract.Supplier;
         var buyer = contract.Client;
 
-        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(transferActId, cancellationToken);
+        var items = await transferActItemRepository.GetTransferActItemsByTransferActIdAsync(act.Id, cancellationToken);
         var itemList = items?.ToList() ?? new List<TransferActItem>();
 
         using var stream = new MemoryStream();
@@ -48,6 +52,7 @@ public class TransferActExcelService : ITransferActExcelService
         {
             var workbookPart = document.AddWorkbookPart();
             workbookPart.Workbook = new Workbook();
+            AddStyles(workbookPart);
 
             var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
             var worksheet = new Worksheet();
@@ -64,12 +69,24 @@ public class TransferActExcelService : ITransferActExcelService
 
             var sheetData = worksheet.AppendChild(new SheetData());
 
+            var columns = new Columns(
+                CreateColumn(1, 1, 8),
+                CreateColumn(2, 2, 35),
+                CreateColumn(3, 3, 12),
+                CreateColumn(4, 4, 12),
+                CreateColumn(5, 5, 18),
+                CreateColumn(6, 6, 18),
+                CreateColumn(7, 7, 22)
+            );
+            worksheet.InsertBefore(columns, sheetData);
+
             AppendRow(sheetData, [$"АКТ №{transferAct.Number}"], true, true);
             AppendRow(sheetData, ["приема-передачи имущества"], true, true);
             AppendRow(sheetData, [$"к договору купли-продажи №{contract.Number}"], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
-            AppendRow(sheetData, [$"г. {transferAct.City}", "", "", "", "", $"«{transferAct.Date.Day}» {GetMonthName(transferAct.Date.Month)} {transferAct.Date.Year} года"]);
+            AppendRow(sheetData, [$"г. {transferAct.City}", "", "", "", "",
+                $"«{transferAct.Date.Day}» {GetMonthName(transferAct.Date.Month)} {transferAct.Date.Year} года"]);
             AppendRow(sheetData, Array.Empty<string>());
 
             AppendRow(sheetData, [ $"{seller.CompanyName}, именуемое в дальнейшем «Продавец», в лице директора, действующего на основании {seller.CeoBasis}, " +
@@ -79,7 +96,8 @@ public class TransferActExcelService : ITransferActExcelService
             AppendRow(sheetData, ["1. Продавец передал, а покупатель принял в собственность следующее имущество:"]);
             AppendRow(sheetData, Array.Empty<string>());
 
-            AppendRow(sheetData, ["№ п/п", "Наименование имущества", "Ед. изм.", "Кол-во", "Цена за ед. (руб.)", "НДС 20% (руб.)", "Общая стоимость (руб.)"], true, true);
+            AppendRow(sheetData, ["№ п/п", "Наименование имущества", "Ед. изм.", "Кол-во", "Цена за ед. (руб.)",
+                $"НДС {(int)(VatRate * 100)}% (руб.)", "Общая стоимость (руб.)"], true, true);
 
             decimal totalSum = 0;
             decimal totalVat = 0;
@@ -87,24 +105,27 @@ public class TransferActExcelService : ITransferActExcelService
             {
                 var item = itemList[i];
                 var sum = item.Quantity * item.UnitPrice;
-                var vat = sum * 0.20m;
+                var vat = sum * VatRate;
                 totalSum += sum;
                 totalVat += vat;
 
                 AppendRow(sheetData,
                 [
-                (i + 1).ToString(),
+                (i + 1),
                 item.Name,
                 item.Unit,
-                ((int)item.Quantity).ToString(),
-                item.UnitPrice.ToString("F2"),
-                vat.ToString("F2"),
-                sum.ToString("F2")
+                item.Quantity,
+                Math.Round(item.UnitPrice, 2),
+                Math.Round(vat, 2),
+                Math.Round(sum, 2)
             ]);
             }
 
+            var rubles = (int)totalSum;
+            var kopecks = (int)Math.Round((totalSum - rubles) * 100);
+
             AppendRow(sheetData, Array.Empty<string>());
-            AppendRow(sheetData, [$"ИТОГО: {totalSum:F2} рублей 00 копеек, в т.ч. НДС {totalVat:F2} рублей."], true, true);
+            AppendRow(sheetData, [$"ИТОГО: {rubles} рублей {kopecks:D2} копеек, в т.ч. НДС {totalVat:F2} рублей."], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
             AppendRow(sheetData, ["2. Стороны совместно при приеме-передаче имущества произвели его осмотр и пришли к соглашению, " +
@@ -121,8 +142,13 @@ public class TransferActExcelService : ITransferActExcelService
             AppendRow(sheetData, ["Продавец:", "", "", "", "", "Покупатель:"], true, true);
             AppendRow(sheetData, Array.Empty<string>());
 
-            var sellerDirector = $"{seller.ContactLastName} {seller.ContactName[0]}.{(seller.ContactPatronymic?.Length > 0 ? seller.ContactPatronymic[0] + "." : "")}";
-            var buyerDirector = $"{buyer.ContactLastName} {buyer.ContactName[0]}.{(buyer.ContactPatronymic?.Length > 0 ? buyer.ContactPatronymic[0] + "." : "")}";
+            var sellerNameInitial = seller.ContactName is { Length: > 0 } ? $" {seller.ContactName[0]}." : "";
+            var sellerPatronymicInitial = seller.ContactPatronymic is { Length: > 0 } ? $"{seller.ContactPatronymic[0]}." : "";
+            var sellerDirector = $"{seller.ContactLastName}{sellerNameInitial}{sellerPatronymicInitial}";
+
+            var buyerNameInitial = buyer.ContactName is { Length: > 0 } ? $" {buyer.ContactName[0]}." : "";
+            var buyerPatronymicInitial = buyer.ContactPatronymic is { Length: > 0 } ? $"{buyer.ContactPatronymic[0]}." : "";
+            var buyerDirector = $"{buyer.ContactLastName}{buyerNameInitial}{buyerPatronymicInitial}";
 
             AppendRow(sheetData, [$"Директор {sellerDirector}", "", "", "", "", $"Директор {buyerDirector}"]);
             AppendRow(sheetData, Array.Empty<string>());
@@ -139,18 +165,87 @@ public class TransferActExcelService : ITransferActExcelService
         return months[month];
     }
 
-    private static void AppendRow(SheetData sheetData, string[] cells, bool isBold = false, bool isCentered = false)
+    private static void AppendRow(SheetData sheetData, object[] cells, bool isBold = false, bool isCentered = false)
     {
+        uint styleIndex = (isBold, isCentered) switch
+        {
+            (false, false) => 0,
+            (true, false) => 1,
+            (false, true) => 2,
+            (true, true) => 3
+        };
+
         var row = new Row();
         foreach (var cellValue in cells)
         {
-            var cell = new Cell
+            var cell = new Cell { StyleIndex = styleIndex };
+            switch (cellValue)
             {
-                CellValue = new CellValue(cellValue),
-                DataType = CellValues.String
-            };
+                case int intVal:
+                    cell.CellValue = new CellValue(intVal.ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                case decimal decVal:
+                    cell.CellValue = new CellValue(Math.Round(decVal, 3).ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                case double dblVal:
+                    cell.CellValue = new CellValue(dblVal.ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                default:
+                    cell.CellValue = new CellValue(cellValue?.ToString() ?? string.Empty);
+                    cell.DataType = CellValues.String;
+                    break;
+            }
             row.Append(cell);
         }
         sheetData.Append(row);
     }
+
+    private static Column CreateColumn(uint min, uint max, double width)
+    {
+        return new Column { Min = min, Max = max, Width = width, CustomWidth = true };
+    }
+
+    private static void AddStyles(WorkbookPart workbookPart)
+    {
+        var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+        stylesPart.Stylesheet = new Stylesheet(
+            new Fonts(
+                new Font(),
+                new Font(new Bold())
+            ),
+            new Fills(
+                new Fill(new PatternFill { PatternType = PatternValues.None }),//0:обязательный дефолт OpenXML
+                new Fill(new PatternFill { PatternType = PatternValues.Gray125 })//1:обязательный дефолт OpenXML
+            ),
+            new Borders(
+                new Border()//0:без рамок
+            ),
+            new CellFormats(
+                new CellFormat { FontId = 0, FillId = 0, BorderId = 0 },//0 обычный
+                new CellFormat { FontId = 1, FillId = 0, BorderId = 0, ApplyFont = true }, //1 жирный
+                new CellFormat
+                {
+                    FontId = 0,
+                    FillId = 0,
+                    BorderId = 0,
+                    Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center },
+                    ApplyAlignment = true
+                },//2:по центру
+                new CellFormat
+                {
+                    FontId = 1,
+                    FillId = 0,
+                    BorderId = 0,
+                    Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center },
+                    ApplyFont = true,
+                    ApplyAlignment = true
+                }//3:жирный и по центру
+            )
+        );
+        stylesPart.Stylesheet.Save();
+    }
+
 }

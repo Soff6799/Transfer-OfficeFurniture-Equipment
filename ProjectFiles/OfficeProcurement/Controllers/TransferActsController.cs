@@ -120,7 +120,7 @@ public class TransferActsController : ControllerBase
     public async Task<IActionResult> ExportToExcel(Guid id, CancellationToken cancellationToken)
     {
         var act = await transferActService.GetTransferActById(id, cancellationToken);
-        var excelBytes = await transferActExcelService.ExportTransferActAsync(act.Id, cancellationToken);
+        var excelBytes = await transferActExcelService.ExportTransferActAsync(act, cancellationToken);
 
         return File(excelBytes,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
