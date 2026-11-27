@@ -68,6 +68,17 @@ public class TransferActExcelService : ITransferActExcelService
 
             var sheetData = worksheet.AppendChild(new SheetData());
 
+            var columns = new Columns(
+                CreateColumn(1, 1, 8),
+                CreateColumn(2, 2, 35),
+                CreateColumn(3, 3, 12),
+                CreateColumn(4, 4, 12),
+                CreateColumn(5, 5, 18),
+                CreateColumn(6, 6, 18),
+                CreateColumn(7, 7, 22)
+            );
+            worksheet.InsertBefore(columns, sheetData);
+
             AppendRow(sheetData, [$"АКТ №{transferAct.Number}"], true, true);
             AppendRow(sheetData, ["приема-передачи имущества"], true, true);
             AppendRow(sheetData, [$"к договору купли-продажи №{contract.Number}"], true, true);
@@ -99,13 +110,13 @@ public class TransferActExcelService : ITransferActExcelService
 
                 AppendRow(sheetData,
                 [
-                (i + 1).ToString(),
+                (i + 1),
                 item.Name,
                 item.Unit,
-                item.Quantity.ToString("0.###", CultureInfo.InvariantCulture),
-                item.UnitPrice.ToString("F2"),
-                vat.ToString("F2"),
-                sum.ToString("F2")
+                item.Quantity,
+                Math.Round(item.UnitPrice, 2),
+                Math.Round(vat, 2),
+                Math.Round(sum, 2)
             ]);
             }
 
@@ -153,18 +164,38 @@ public class TransferActExcelService : ITransferActExcelService
         return months[month];
     }
 
-    private static void AppendRow(SheetData sheetData, string[] cells, bool isBold = false, bool isCentered = false)
+    private static void AppendRow(SheetData sheetData, object[] cells, bool isBold = false, bool isCentered = false)
     {
         var row = new Row();
         foreach (var cellValue in cells)
         {
-            var cell = new Cell
+            var cell = new Cell();
+            switch (cellValue)
             {
-                CellValue = new CellValue(cellValue),
-                DataType = CellValues.String
-            };
+                case int intVal:
+                    cell.CellValue = new CellValue(intVal.ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                case decimal decVal:
+                    cell.CellValue = new CellValue(Math.Round(decVal, 3).ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                case double dblVal:
+                    cell.CellValue = new CellValue(dblVal.ToString(CultureInfo.InvariantCulture));
+                    cell.DataType = CellValues.Number;
+                    break;
+                default:
+                    cell.CellValue = new CellValue(cellValue?.ToString() ?? string.Empty);
+                    cell.DataType = CellValues.String;
+                    break;
+            }
             row.Append(cell);
         }
         sheetData.Append(row);
+    }
+
+    private static Column CreateColumn(uint min, uint max, double width)
+    {
+        return new Column { Min = min, Max = max, Width = width, CustomWidth = true };
     }
 }
