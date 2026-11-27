@@ -35,8 +35,7 @@ public abstract class ClientModelBaseValidator<T> : AbstractValidator<T>
 
         RuleFor(x => x.Inn)
             .NotEmpty().WithMessage("ИНН обязателен")
-            .Matches(@"^\d{10}$").WithMessage("ИНН должен состоять из 10 цифр")
-            .MaximumLength(12).WithMessage("ИНН не должен превышать 12 символов");
+            .Matches(@"^(\d{10}|\d{12})$").WithMessage("ИНН должен состоять из 10 или 12 цифр");
 
         RuleFor(x => x.LegalAddress)
             .NotEmpty().WithMessage("Юридический адрес обязателен")

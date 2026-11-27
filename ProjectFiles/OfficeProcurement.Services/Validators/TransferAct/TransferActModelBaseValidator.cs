@@ -23,7 +23,9 @@ public abstract class TransferActModelBaseValidator<T> : AbstractValidator<T>
             .MaximumLength(50).WithMessage("Номер акта не должен превышать 50 символов");
 
         RuleFor(x => x.Date)
-            .NotEmpty().WithMessage("Дата составления обязательна");
+            .NotEmpty().WithMessage("Дата составления обязательна")
+            .Must(d => d >= new DateOnly(1900, 1, 1)).WithMessage("Дата не может быть раньше 1900 года")
+            .Must(d => d <= DateOnly.FromDateTime(DateTime.UtcNow)).WithMessage("Дата не может быть в будущем");
 
         RuleFor(x => x.City)
             .NotEmpty().WithMessage("Город составления обязателен")

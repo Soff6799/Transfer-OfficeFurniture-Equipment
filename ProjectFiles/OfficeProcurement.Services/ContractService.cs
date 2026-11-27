@@ -78,7 +78,7 @@ public class ContractService : IContractService
         var existing = await contractRepository.GetContractByNumberAsync(contractCreateModel.Number, cancellationToken);
         if (existing is not null)
         {
-            throw new OfficeProcurementInvalidOperationException($"Договор с номером '{contractCreateModel.Number}' уже существует");
+            throw new OfficeProcurementConflictException($"Договор с номером '{contractCreateModel.Number}' уже существует");
         }
         var entity = mapper.Map<Contract>(contractCreateModel);
         contractRepository.Add(entity);
@@ -107,7 +107,7 @@ public class ContractService : IContractService
         var existing = await contractRepository.GetContractByNumberAsync(contractModel.Number, cancellationToken);
         if (existing is not null && existing.Id != contractModel.Id)
         {
-            throw new OfficeProcurementInvalidOperationException($"Договор с номером '{contractModel.Number}' уже существует");
+            throw new OfficeProcurementConflictException($"Договор с номером '{contractModel.Number}' уже существует");
         }
         var entity = await contractRepository.GetContractByIdAsync(contractModel.Id, cancellationToken);
         if (entity is null)

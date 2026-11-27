@@ -72,7 +72,7 @@ public class ProductService : IProductService
             var existing = await productRepository.GetProductByStockNumberAsync(productCreateModel.StockNumber, cancellationToken);
             if (existing is not null)
             {
-                throw new OfficeProcurementInvalidOperationException($"Продукт со складским номером '{productCreateModel.StockNumber}' уже существует");
+                throw new OfficeProcurementConflictException($"Продукт со складским номером '{productCreateModel.StockNumber}' уже существует");
             }
         }
         var entity = mapper.Map<Product>(productCreateModel);
@@ -97,7 +97,7 @@ public class ProductService : IProductService
             var existing = await productRepository.GetProductByStockNumberAsync(productModel.StockNumber, cancellationToken);
             if (existing is not null && existing.Id != productModel.Id)
             {
-                throw new OfficeProcurementInvalidOperationException($"Продукт со складским номером '{productModel.StockNumber}' уже существует");
+                throw new OfficeProcurementConflictException($"Продукт со складским номером '{productModel.StockNumber}' уже существует");
             }
         }
         var entity = await productRepository.GetProductByIdAsync(productModel.Id, cancellationToken);

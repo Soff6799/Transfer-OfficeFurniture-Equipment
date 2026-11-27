@@ -151,7 +151,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => transferActService.CreateTransferAct(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>
@@ -258,7 +258,7 @@ public class TransferActServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => transferActService.UpdateTransferAct(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>

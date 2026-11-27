@@ -27,7 +27,9 @@ public abstract class ContractModelBaseValidator<T> : AbstractValidator<T>
             .MaximumLength(50).WithMessage("Номер договора не должен превышать 50 символов");
 
         RuleFor(x => x.Date)
-            .NotEmpty().WithMessage("Дата подписания обязательна");
+            .NotEmpty().WithMessage("Дата подписания обязательна")
+            .Must(d => d >= new DateOnly(1900, 1, 1)).WithMessage("Дата не может быть раньше 1900 года")
+            .Must(d => d <= DateOnly.FromDateTime(DateTime.UtcNow)).WithMessage("Дата не может быть в будущем");
 
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Недопустимый тип договора");

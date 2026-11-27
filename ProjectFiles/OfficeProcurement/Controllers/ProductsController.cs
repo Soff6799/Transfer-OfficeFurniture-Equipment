@@ -36,6 +36,7 @@ public class ProductsController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<ProductApiModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var products = await productService.GetProducts(cancellationToken);
@@ -48,6 +49,7 @@ public class ProductsController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<ProductApiModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var product = await productService.GetProductById(id, cancellationToken);
@@ -58,15 +60,17 @@ public class ProductsController : ControllerBase
     /// Создаёт новый продукт
     /// </summary>
     [HttpPost]
-    [ProducesResponseType<ProductApiModel>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType<ProductApiModel>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] ProductCreateApiModel createModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ProductCreateModel>(createModel);
         await validateService.ValidateAsync(mapped, cancellationToken);
         var result = await productService.CreateProduct(mapped, cancellationToken);
-        return Ok(mapper.Map<ProductApiModel>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, mapper.Map<ProductApiModel>(result));
     }
 
     /// <summary>
@@ -74,9 +78,11 @@ public class ProductsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ProductCreateApiModel updateModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<ProductModel>(updateModel);
@@ -93,6 +99,8 @@ public class ProductsController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await productService.DeleteProduct(id, cancellationToken);

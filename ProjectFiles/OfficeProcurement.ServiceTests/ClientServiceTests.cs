@@ -142,7 +142,7 @@ public class ClientServiceTests : BaseServiceTests
 
         // Act & Assert
         var act = () => clientService.CreateClient(model, CancellationToken.None);
-        await act.Should().ThrowAsync<OfficeProcurementInvalidOperationException>();
+        await act.Should().ThrowAsync<OfficeProcurementConflictException>();
     }
 
     /// <summary>

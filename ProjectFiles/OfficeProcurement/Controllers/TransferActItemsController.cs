@@ -35,6 +35,7 @@ public class TransferActItemsController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<TransferActItemApiModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var items = await transferActItemService.GetTransferActItems(cancellationToken);
@@ -47,6 +48,7 @@ public class TransferActItemsController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<TransferActItemApiModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var item = await transferActItemService.GetTransferActItemById(id, cancellationToken);
@@ -57,15 +59,17 @@ public class TransferActItemsController : ControllerBase
     /// Создаёт новую позицию акта передачи
     /// </summary>
     [HttpPost]
-    [ProducesResponseType<TransferActItemApiModel>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType<TransferActItemApiModel>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] TransferActItemCreateApiModel createModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<TransferActItemCreateModel>(createModel);
         await validateService.ValidateAsync(mapped, cancellationToken);
         var result = await transferActItemService.CreateTransferActItem(mapped, cancellationToken);
-        return Ok(mapper.Map<TransferActItemApiModel>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, mapper.Map<TransferActItemApiModel>(result));
     }
 
     /// <summary>
@@ -73,9 +77,11 @@ public class TransferActItemsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] TransferActItemCreateApiModel updateModel, CancellationToken cancellationToken)
     {
         var mapped = mapper.Map<TransferActItemModel>(updateModel);
@@ -92,6 +98,7 @@ public class TransferActItemsController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await transferActItemService.DeleteTransferActItem(id, cancellationToken);

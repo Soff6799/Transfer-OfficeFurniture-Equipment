@@ -1,4 +1,3 @@
-using OfficeProcurement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using OfficeProcurement.Services.Contracts.Exceptions;
@@ -6,64 +5,93 @@ using OfficeProcurement.Services.Contracts.Exceptions;
 namespace OfficeProcurement.Infrastructure;
 
 /// <summary>
-/// Фильтр исключений для преобразования бизнес-исключений в HTTP-ответы
+/// Фильтр исключений для преобразования бизнес-исключений и системных ошибок в HTTP-ответы (ProblemDetails)
 /// </summary>
 public class ExceptionFilter : IExceptionFilter
 {
+    private readonly ILogger<ExceptionFilter> logger;
+
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="ExceptionFilter"/>
+    /// </summary>
+    public ExceptionFilter(ILogger<ExceptionFilter> logger)
+    {
+        this.logger = logger;
+    }
+
     /// <inheritdoc />
     public void OnException(ExceptionContext context)
     {
-        var exception = context.Exception as OfficeProcurementException;
-        if (exception == null)
-        {
-            return;
-        }
+        var exception = context.Exception;
+        logger.LogError(exception, "Необработанное исключение: {ExceptionType}", exception.GetType().Name);
 
         switch (exception)
         {
             case NotFoundException ex:
-                SetDataToContext(new NotFoundObjectResult(new ApiExceptionDetail
-                {
-                    Message = ex.Message,
-                }), context);
+                SetProblemDetails(context, StatusCodes.Status404NotFound, "Not Found", ex.Message);
                 break;
+
+            case OfficeProcurementConflictException ex:
+                SetProblemDetails(context, StatusCodes.Status409Conflict, "Conflict", ex.Message);
+                break;
+
             case OfficeProcurementInvalidOperationException ex:
-                SetDataToContext(new BadRequestObjectResult(new ApiExceptionDetail { Message = ex.Message })
+                SetProblemDetails(context, StatusCodes.Status406NotAcceptable, "Invalid Operation", ex.Message);
+                break;
+
+            case OfficeProcurementValidationException ex:
+                var errors = ex.Errors
+                    .GroupBy(e => e.Field)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.Message).ToArray());
+
+                var validationProblem = new ValidationProblemDetails(errors)
                 {
-                    StatusCode = StatusCodes.Status406NotAcceptable,
+                    Status = StatusCodes.Status422UnprocessableEntity,
+                    Title = "Validation Failed",
+                    Detail = ex.Message
+                };
+
+                SetDataToContext(new ObjectResult(validationProblem)
+                {
+                    StatusCode = StatusCodes.Status422UnprocessableEntity
                 }, context);
                 break;
-            case OfficeProcurementValidationException ex:
-                SetDataToContext(
-                    new BadRequestObjectResult(new ApiValidationExceptionDetail { Errors = ex.Errors })
-                    {
-                        StatusCode = StatusCodes.Status422UnprocessableEntity,
-                    },
-                    context);
+
+            case OfficeProcurementException ex:
+                SetProblemDetails(context, StatusCodes.Status400BadRequest, "Bad Request", ex.Message);
                 break;
-            case OfficeProcurementConflictException ex:
-                SetDataToContext(new ConflictObjectResult(new ApiExceptionDetail
-                {
-                    Message = ex.Message,
-                }), context);
-                break;
+
             default:
-                SetDataToContext(new BadRequestObjectResult(new ApiExceptionDetail
-                {
-                    Message = exception.Message,
-                }), context);
+                SetProblemDetails(
+                    context,
+                    StatusCodes.Status500InternalServerError,
+                    "Internal Server Error",
+                    "Произошла внутренняя ошибка сервера");
                 break;
         }
     }
 
-    /// <summary>
-    /// Определяет контекст ответа
-    /// </summary>
+    private static void SetProblemDetails(ExceptionContext context, int statusCode, string title, string detail)
+    {
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail
+        };
+
+        SetDataToContext(new ObjectResult(problemDetails)
+        {
+            StatusCode = statusCode
+        }, context);
+    }
+
     private static void SetDataToContext(ObjectResult data, ExceptionContext context)
     {
         context.ExceptionHandled = true;
-        var response = context.HttpContext.Response;
-        response.StatusCode = data.StatusCode ?? StatusCodes.Status400BadRequest;
+        context.HttpContext.Response.StatusCode = data.StatusCode ?? StatusCodes.Status400BadRequest;
         context.Result = data;
     }
 }
