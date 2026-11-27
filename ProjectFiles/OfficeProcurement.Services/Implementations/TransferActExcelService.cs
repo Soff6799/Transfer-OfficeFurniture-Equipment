@@ -52,6 +52,7 @@ public class TransferActExcelService : ITransferActExcelService
         {
             var workbookPart = document.AddWorkbookPart();
             workbookPart.Workbook = new Workbook();
+            AddStyles(workbookPart);
 
             var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
             var worksheet = new Worksheet();
@@ -166,10 +167,18 @@ public class TransferActExcelService : ITransferActExcelService
 
     private static void AppendRow(SheetData sheetData, object[] cells, bool isBold = false, bool isCentered = false)
     {
+        uint styleIndex = (isBold, isCentered) switch
+        {
+            (false, false) => 0,
+            (true, false) => 1,
+            (false, true) => 2,
+            (true, true) => 3
+        };
+
         var row = new Row();
         foreach (var cellValue in cells)
         {
-            var cell = new Cell();
+            var cell = new Cell { StyleIndex = styleIndex };
             switch (cellValue)
             {
                 case int intVal:
@@ -198,4 +207,45 @@ public class TransferActExcelService : ITransferActExcelService
     {
         return new Column { Min = min, Max = max, Width = width, CustomWidth = true };
     }
+
+    private static void AddStyles(WorkbookPart workbookPart)
+    {
+        var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+        stylesPart.Stylesheet = new Stylesheet(
+            new Fonts(
+                new Font(),
+                new Font(new Bold())
+            ),
+            new Fills(
+                new Fill(new PatternFill { PatternType = PatternValues.None }),//0:обязательный дефолт OpenXML
+                new Fill(new PatternFill { PatternType = PatternValues.Gray125 })//1:обязательный дефолт OpenXML
+            ),
+            new Borders(
+                new Border()//0:без рамок
+            ),
+            new CellFormats(
+                new CellFormat { FontId = 0, FillId = 0, BorderId = 0 },//0 обычный
+                new CellFormat { FontId = 1, FillId = 0, BorderId = 0, ApplyFont = true }, //1 жирный
+                new CellFormat
+                {
+                    FontId = 0,
+                    FillId = 0,
+                    BorderId = 0,
+                    Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center },
+                    ApplyAlignment = true
+                },//2:по центру
+                new CellFormat
+                {
+                    FontId = 1,
+                    FillId = 0,
+                    BorderId = 0,
+                    Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center },
+                    ApplyFont = true,
+                    ApplyAlignment = true
+                }//3:жирный и по центру
+            )
+        );
+        stylesPart.Stylesheet.Save();
+    }
+
 }
